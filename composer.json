@@ -1,0 +1,31 @@
+{
+    "name": "abs/coupon-pkg",
+    "description": "For Redeemable Coupons",
+    "type": "library",
+    "require":
+    {},
+    "require-dev":
+    {},
+    "authors": [
+    {
+        "name": "Abdul",
+        "email": "abdulpro@gmail.com"
+    }],
+    "minimum-stability": "dev",
+    "extra":
+    {
+        "laravel":
+        {
+            "providers": [
+                "Abs\\CouponPkg\\CouponPkgServiceProvider"
+            ]
+        }
+    },
+    "autoload":
+    {
+        "psr-4":
+        {
+            "Abs\\CouponPkg\\": "src/"
+        }
+    }
+}
