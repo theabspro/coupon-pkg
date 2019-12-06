@@ -2,16 +2,18 @@ app.config(['$routeProvider', function($routeProvider) {
 
     $routeProvider.
     //Coupon
-    when('/Coupon-pkg/Coupon/list', {
-        template: '<Coupon-list></Coupon-list>',
+    when('/coupon-pkg/coupons', {
+        template: '<coupons></coupons>',
         title: 'Coupons',
     }).
-    when('/Coupon-pkg/Coupon/add', {
-        template: '<Coupon-form></Coupon-form>',
-        title: 'Add Coupon',
+    when('/coupon-pkg/coupon/view/:id', {
+        template: '<coupon-view></coupon-view>',
+        title: 'Coupon',
     }).
-    when('/Coupon-pkg/Coupon/edit/:id', {
-        template: '<Coupon-form></Coupon-form>',
-        title: 'Edit Coupon',
-    });
+    when('/coupon-pkg/claimed-coupons', {
+        template: '<claimed-coupons></claimed-coupons>',
+        title: 'Claimed Coupons',
+    }).
+
+
 }]);

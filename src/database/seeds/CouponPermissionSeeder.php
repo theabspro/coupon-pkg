@@ -13,31 +13,37 @@ class CouponPermissionSeeder extends Seeder {
 	public function run() {
 		$permissions = [
 			//MASTER > CouponS
-			4600 => [
+			10000 => [
 				'display_order' => 10,
 				'parent_id' => null,
-				'name' => 'Coupons',
+				'name' => 'coupons',
 				'display_name' => 'Coupons',
 			],
-			4601 => [
+			10001 => [
 				'display_order' => 1,
-				'parent_id' => 4600,
-				'name' => 'add-Coupon',
-				'display_name' => 'Add',
+				'parent_id' => 10000,
+				'name' => 'import-coupon',
+				'display_name' => 'Import',
 			],
-			4602 => [
+			10002 => [
 				'display_order' => 2,
-				'parent_id' => 4600,
-				'name' => 'edit-Coupon',
-				'display_name' => 'Edit',
-			],
-			4603 => [
-				'display_order' => 3,
-				'parent_id' => 4600,
-				'name' => 'delete-Coupon',
-				'display_name' => 'Delete',
+				'parent_id' => 10000,
+				'name' => 'view-all-coupon',
+				'display_name' => 'View All',
 			],
 
+			10020 => [
+				'display_order' => 2,
+				'parent_id' => null,
+				'name' => 'claimed-coupons',
+				'display_name' => 'claimed-coupons',
+			],
+			10021 => [
+				'display_order' => 2,
+				'parent_id' => 10020,
+				'name' => 'view-all-claimed-coupons',
+				'display_name' => 'View All',
+			],
 		];
 
 		foreach ($permissions as $permission_id => $permsion) {

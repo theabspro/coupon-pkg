@@ -1,5 +1,5 @@
-app.component('CouponList', {
-    templateUrl: Coupon_list_template_url,
+app.component('coupons', {
+    templateUrl: coupon_list_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
         $scope.loading = true;
         var self = this;
@@ -124,8 +124,8 @@ app.component('CouponList', {
 });
 //------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------
-app.component('CouponForm', {
-    templateUrl: Coupon_form_template_url,
+app.component('couponView', {
+    templateUrl: coupon_view_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
         get_form_data_url = typeof($routeParams.id) == 'undefined' ? Coupon_get_form_data_url : Coupon_get_form_data_url + '/' + $routeParams.id;
         var self = this;
