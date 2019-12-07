@@ -1,11 +1,13 @@
 <?php
+namespace Abs\CouponPkg\Database\Seeds;
 
+use Abs\CouponPkg\Coupon;
 use App\Company;
-use App\CouponPkg\Coupon;
+use DB;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 
-class ManualCouponSeeder extends Seeder {
+class PkgManualCouponSeeder extends Seeder {
 	/**
 	 * Run the database seeds.
 	 *
@@ -27,12 +29,13 @@ class ManualCouponSeeder extends Seeder {
 		$no_of_items = $this->command->ask("Enter No of Coupon Code to Generate", '20');
 		$prefix = $this->command->ask("Enter prefix", 'CL');
 		$points = $this->command->ask("Enter points", '20');
+		$starting_number = $this->command->ask("Enter Starting Serial Number", 1);
 
-		for ($i = 1; $i <= $no_of_items; $i++) {
+		for ($i = $starting_number; $i <= $starting_number + $no_of_items; $i++) {
 			$coupon = Coupon::create([
 				'company_id' => $company->id,
 				'code' => $prefix . '-' . $i,
-				'date' => date('d/m/Y'),
+				'date' => date('Y-m-d'),
 				'point' => $points,
 				'status_id' => 7400,
 				'created_by_id' => $admin->id,
