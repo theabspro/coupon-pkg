@@ -1,123 +1,123 @@
-app.component('coupons', {
-    templateUrl: coupon_list_template_url,
+app.component('couponCodes', {
+    templateUrl: coupon_codes_list_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope, $location) {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
-        var table_scroll;
-        table_scroll = $('.page-main-content').height() - 37;
-        var dataTable = $('#Coupons_list').DataTable({
-            "dom": cndn_dom_structure,
-            "language": {
-                // "search": "",
-                // "searchPlaceholder": "Search",
-                "lengthMenu": "Rows _MENU_",
-                "paginate": {
-                    "next": '<i class="icon ion-ios-arrow-forward"></i>',
-                    "previous": '<i class="icon ion-ios-arrow-back"></i>'
-                },
-            },
-            pageLength: 10,
-            processing: true,
-            stateSaveCallback: function(settings, data) {
-                localStorage.setItem('CDataTables_' + settings.sInstance, JSON.stringify(data));
-            },
-            stateLoadCallback: function(settings) {
-                var state_save_val = JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
-                if (state_save_val) {
-                    $('#search_Coupon').val(state_save_val.search.search);
-                }
-                return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
-            },
-            serverSide: true,
-            paging: true,
-            stateSave: true,
-            ordering: false,
-            scrollY: table_scroll + "px",
-            scrollCollapse: true,
-            ajax: {
-                url: laravel_routes['getCouponList'],
-                type: "GET",
-                dataType: "json",
-                data: function(d) {
-                    d.Coupon_code = $('#Coupon_code').val();
-                    d.Coupon_name = $('#Coupon_name').val();
-                    d.mobile_no = $('#mobile_no').val();
-                    d.email = $('#email').val();
-                },
-            },
+        // var table_scroll;
+        // table_scroll = $('.page-main-content').height() - 37;
+        // var dataTable = $('#Coupons_list').DataTable({
+        //     "dom": cndn_dom_structure,
+        //     "language": {
+        //         // "search": "",
+        //         // "searchPlaceholder": "Search",
+        //         "lengthMenu": "Rows _MENU_",
+        //         "paginate": {
+        //             "next": '<i class="icon ion-ios-arrow-forward"></i>',
+        //             "previous": '<i class="icon ion-ios-arrow-back"></i>'
+        //         },
+        //     },
+        //     pageLength: 10,
+        //     processing: true,
+        //     stateSaveCallback: function(settings, data) {
+        //         localStorage.setItem('CDataTables_' + settings.sInstance, JSON.stringify(data));
+        //     },
+        //     stateLoadCallback: function(settings) {
+        //         var state_save_val = JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+        //         if (state_save_val) {
+        //             $('#search_Coupon').val(state_save_val.search.search);
+        //         }
+        //         return JSON.parse(localStorage.getItem('CDataTables_' + settings.sInstance));
+        //     },
+        //     serverSide: true,
+        //     paging: true,
+        //     stateSave: true,
+        //     ordering: false,
+        //     scrollY: table_scroll + "px",
+        //     scrollCollapse: true,
+        //     ajax: {
+        //         url: laravel_routes['getCouponList'],
+        //         type: "GET",
+        //         dataType: "json",
+        //         data: function(d) {
+        //             d.Coupon_code = $('#Coupon_code').val();
+        //             d.Coupon_name = $('#Coupon_name').val();
+        //             d.mobile_no = $('#mobile_no').val();
+        //             d.email = $('#email').val();
+        //         },
+        //     },
 
-            columns: [
-                { data: 'action', class: 'action', name: 'action', searchable: false },
-                { data: 'code', name: 'Coupons.code' },
-                { data: 'name', name: 'Coupons.name' },
-                { data: 'mobile_no', name: 'Coupons.mobile_no' },
-                { data: 'email', name: 'Coupons.email' },
-            ],
-            "infoCallback": function(settings, start, end, max, total, pre) {
-                $('#table_info').html(total)
-                $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
-            },
-            rowCallback: function(row, data) {
-                $(row).addClass('highlight-row');
-            }
-        });
-        $('.dataTables_length select').select2();
+        //     columns: [
+        //         { data: 'action', class: 'action', name: 'action', searchable: false },
+        //         { data: 'code', name: 'Coupons.code' },
+        //         { data: 'name', name: 'Coupons.name' },
+        //         { data: 'mobile_no', name: 'Coupons.mobile_no' },
+        //         { data: 'email', name: 'Coupons.email' },
+        //     ],
+        //     "infoCallback": function(settings, start, end, max, total, pre) {
+        //         $('#table_info').html(total)
+        //         $('.foot_info').html('Showing ' + start + ' to ' + end + ' of ' + max + ' entries')
+        //     },
+        //     rowCallback: function(row, data) {
+        //         $(row).addClass('highlight-row');
+        //     }
+        // });
+        // $('.dataTables_length select').select2();
 
-        $scope.clear_search = function() {
-            $('#search_Coupon').val('');
-            $('#Coupons_list').DataTable().search('').draw();
-        }
+        // $scope.clear_search = function() {
+        //     $('#search_Coupon').val('');
+        //     $('#Coupons_list').DataTable().search('').draw();
+        // }
 
-        var dataTables = $('#Coupons_list').dataTable();
-        $("#search_Coupon").keyup(function() {
-            dataTables.fnFilter(this.value);
-        });
+        // var dataTables = $('#Coupons_list').dataTable();
+        // $("#search_Coupon").keyup(function() {
+        //     dataTables.fnFilter(this.value);
+        // });
 
-        //DELETE
-        $scope.deleteCoupon = function($id) {
-            $('#Coupon_id').val($id);
-        }
-        $scope.deleteConfirm = function() {
-            $id = $('#Coupon_id').val();
-            $http.get(
-                Coupon_delete_data_url + '/' + $id,
-            ).then(function(response) {
-                if (response.data.success) {
-                    $noty = new Noty({
-                        type: 'success',
-                        layout: 'topRight',
-                        text: 'Coupon Deleted Successfully',
-                    }).show();
-                    setTimeout(function() {
-                        $noty.close();
-                    }, 3000);
-                    $('#Coupons_list').DataTable().ajax.reload(function(json) {});
-                    $location.path('/Coupon-pkg/Coupon/list');
-                }
-            });
-        }
+        // //DELETE
+        // $scope.deleteCoupon = function($id) {
+        //     $('#Coupon_id').val($id);
+        // }
+        // $scope.deleteConfirm = function() {
+        //     $id = $('#Coupon_id').val();
+        //     $http.get(
+        //         Coupon_delete_data_url + '/' + $id,
+        //     ).then(function(response) {
+        //         if (response.data.success) {
+        //             $noty = new Noty({
+        //                 type: 'success',
+        //                 layout: 'topRight',
+        //                 text: 'Coupon Deleted Successfully',
+        //             }).show();
+        //             setTimeout(function() {
+        //                 $noty.close();
+        //             }, 3000);
+        //             $('#Coupons_list').DataTable().ajax.reload(function(json) {});
+        //             $location.path('/Coupon-pkg/Coupon/list');
+        //         }
+        //     });
+        // }
 
-        //FOR FILTER
-        $('#Coupon_code').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $('#Coupon_name').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $('#mobile_no').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $('#email').on('keyup', function() {
-            dataTables.fnFilter();
-        });
-        $scope.reset_filter = function() {
-            $("#Coupon_name").val('');
-            $("#Coupon_code").val('');
-            $("#mobile_no").val('');
-            $("#email").val('');
-            dataTables.fnFilter();
-        }
+        // //FOR FILTER
+        // $('#Coupon_code').on('keyup', function() {
+        //     dataTables.fnFilter();
+        // });
+        // $('#Coupon_name').on('keyup', function() {
+        //     dataTables.fnFilter();
+        // });
+        // $('#mobile_no').on('keyup', function() {
+        //     dataTables.fnFilter();
+        // });
+        // $('#email').on('keyup', function() {
+        //     dataTables.fnFilter();
+        // });
+        // $scope.reset_filter = function() {
+        //     $("#Coupon_name").val('');
+        //     $("#Coupon_code").val('');
+        //     $("#mobile_no").val('');
+        //     $("#email").val('');
+        //     dataTables.fnFilter();
+        // }
 
         $rootScope.loading = false;
     }
@@ -125,7 +125,7 @@ app.component('coupons', {
 //------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------
 app.component('couponView', {
-    templateUrl: coupon_view_template_url,
+    templateUrl: coupon_codes_view_template_url,
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
         get_form_data_url = typeof($routeParams.id) == 'undefined' ? Coupon_get_form_data_url : Coupon_get_form_data_url + '/' + $routeParams.id;
         var self = this;

@@ -3,8 +3,8 @@ app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     //Coupon
     when('/coupon-pkg/coupons', {
-        template: '<coupons></coupons>',
-        title: 'Coupons',
+        template: '<coupon-codes></coupon-codes>',
+        title: 'Coupon Codes',
     }).
     when('/coupon-pkg/coupon/view/:id', {
         template: '<coupon-view></coupon-view>',
@@ -13,7 +13,7 @@ app.config(['$routeProvider', function($routeProvider) {
     when('/coupon-pkg/claimed-coupons', {
         template: '<claimed-coupons></claimed-coupons>',
         title: 'Claimed Coupons',
-    }).
+    });
 
 
 }]);

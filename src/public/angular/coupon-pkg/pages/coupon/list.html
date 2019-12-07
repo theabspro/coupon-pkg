@@ -1,114 +1,104 @@
-<div class="content-wrap cndn-wrap">
-    <div class="page-header">
-        <div class="page-header-inner">
-            <div class="page-header-content-left">
-                <div class="page-header-content title-block">
-                    <h1 class="title type-2">Coupons</h1>
-                </div><!-- Page Header Content -->
-                <div class="page-header-content button-block">
-                    <button class="btn btn-bordered" data-toggle="modal" data-target="#Coupon-filter-modal"><i class="icon ion-md-funnel"></i>Filter</button>
-                </div><!-- Page Header Content -->
-            </div><!-- Page Header Content Left -->
-            <div class="page-header-content-right">
-                <div class="page-header-content indicator-block">
-                    <ul class="indicator-list">
-                        <li class="green">Active</li>
-                        <li class="red">In Active</li>
-                    </ul>
-                </div><!-- Page Header Content -->
-                <div class="page-header-content search-block">
-                    <div class="search_filter">
-                        <label>
-                            <input type="search" id="search_Coupon" class="form-control" placeholder="Search" />
-                            <button class="btn-clear" ng-click="clear_search()">Clear</button>
-                        </label>
-                    </div><!-- Search Filter -->
-                </div><!-- Page Header Content -->
-                <div class="page-header-content button-block">
-                    <a href="#!/Coupon-pkg/Coupon/add" class="btn btn-primary">Add New</a>
-                </div><!-- Page Header Content -->
-            </div><!-- Page Header Content Right -->
-        </div><!-- Page Header Inner -->
-    </div><!-- Page Header -->
-    <div class="page-main-content list-page-content">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <table class="table" id="Coupons_list" style="width: 100% !important;">
-                        <thead>
-                            <tr>
-                                <th class="action">Action</th>
-                                <th>Coupon Code</th>
-                                <th>Coupon Name</th>
-                                <th>Mobile Number</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div><!-- Column -->
-            </div><!-- Row -->
-        </div><!-- Container -->
-    </div><!-- Page Main Content -->
-</div><!-- Content Wrap -->
-<!-- Filter Modal -->
-<div class="modal fade filter" id="Coupon-filter-modal" role="dialog" aria-labelledby="myModalLabel">
+<div class="content-wrap pb-80" id="filter_invoice">
+    <table class="table table-striped table-fixed-header" id="po_table">
+        <thead>
+            <tr>
+                <th class="actions">Actions</th>
+                <th>Coupon Code</th>
+                <th>Printed Date</th>
+                <th>Coupon Point</th>
+                <th>Uploaded Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="hide">
+        <div id="add_new_wrap">
+            <a href="#!/purchase/order/import" role="button" class="btn btn-secondary btn-md">Import</a>
+        </div>
+    </div>
+</div><!-- Responsive -->
+<div class="modal fade modal-filter" id="po-filter" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close ripple" data-dismiss="modal" aria-label="Close"><i class="icon ion-md-close"></i></button>
-                <h5 class="modal-title" id="myModalLabel">Coupon Filter</h5>
+                <button type="button" class="btn btn-close btn-img" data-dismiss="modal" aria-label="Close">
+                    <img src="./public/img/content/modal/close-circle.svg" alt="colse" class="img-responsive" onmouseover="this.src='./public/img/content/modal/close-circle-active.svg'" onmouseout="this.src='./public/img/content/modal/close-circle.svg'">
+                </button>
+                <h5 class="modal-title">Filter</h5>
             </div><!-- Modal Header -->
             <div class="modal-body">
-                <div class="modal-form">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Coupon Code</label>
-                                <input type="text" class="form-control" id="Coupon_code" name="Coupon_code" placeholder="Enter Coupon Code" autocomplete="off">
-                            </div><!-- Field -->
-                        </div><!-- Column -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Coupon Name</label>
-                                <input type="text" class="form-control" id="Coupon_name" name="Coupon_name" placeholder="Enter Coupon Name" autocomplete="off">
-                            </div><!-- Field -->
-                        </div><!-- Column -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Mobile Number</label>
-                                <input type="text" class="form-control" id="mobile_no" name="mobile_no" placeholder="Enter Mobile Number" autocomplete="off">
-                            </div><!-- Field -->
-                        </div><!-- Column -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Enter Email" autocomplete="off">
-                            </div><!-- Field -->
-                        </div><!-- Column -->
-                        <div class="col-md-6">
-                            <button type="button" class="btn btn-rose" ng-click="reset_filter()">Reset Filter</button>
-                        </div>
-                    </div><!-- Row -->
-                </div><!-- Modal Form -->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="input-text form-group">
+                            <label>From</label>
+                            <div class="input-group date btwn-img" data-provide="datepicker">
+                                <input type="text" class="form-control date_filter" id="start_date" placeholder="Select From Date" aria-invalid="false" />
+                                <div class="input-group-addon">
+                                    <img class="img-responsive date_filter" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
+                                </div>
+                            </div><!-- Input Group -->
+                        </div><!-- Field -->
+                    </div><!-- Column -->
+                    <div class="col-sm-6">
+                        <div class="input-text form-group">
+                            <label>To</label>
+                            <div class="input-group date" data-provide="datepicker">
+                                <input type="text" class="form-control date_filter" id="end_date" placeholder="Select To Date" aria-invalid="false" />
+                                <div class="input-group-addon">
+                                    <img class="img-responsive" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
+                                </div>
+                            </div><!-- Input Group -->
+                        </div><!-- Field -->
+                    </div><!-- Column -->
+                </div><!-- Row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group input-text">
+                            <label>Status</label>
+                            <ul class="filter-list">
+                                <li>
+                                    <div class="filter-checkbox po_filter">
+                                        <div class="filter-checkbox-option">
+                                            <input type="checkbox" class="filter-checkbox-option" id="checkbox-all" name="status[]" value="all">
+                                            <label for="checkbox-all">All</label>
+                                        </div>
+                                    </div><!-- Filter Checkbox -->
+                                </li>
+                                <li>
+                                    <div class="filter-checkbox purchase_order">
+                                        <div class="filter-checkbox-option">
+                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-pending" value="1">
+                                            <label class="red" for="checkbox-pending">Pending</label>
+                                        </div>
+                                        <div class="filter-checkbox-option">
+                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-partial" value="2">
+                                            <label class="yellow" for="checkbox-partial">Partial</label>
+                                        </div>
+                                        <!--   <div class="filter-checkbox-option">
+                                        <input type="checkbox" id="checkbox-partial-return">
+                                        <label class="yellow" for="checkbox-partial-return">Partial Return</label>
+                                    </div> -->
+                                        <div class="filter-checkbox-option">
+                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-completed" value="3">
+                                            <label class="green" for="checkbox-completed">Completed</label>
+                                        </div>
+                                        <!--  <div class="filter-checkbox-option">
+                                        <input type="checkbox" id="checkbox-invoiced">
+                                        <label for="checkbox-invoiced">Invoiced</label>
+                                    </div>
+                                    <div class="filter-checkbox-option">
+                                        <input type="checkbox" id="checkbox-dispatched">
+                                        <label for="checkbox-dispatched">Dispatched</label>
+                                    </div> -->
+                                    </div><!-- Filter Checkbox -->
+                                </li>
+                                <input type="hidden" name="polist_status[]" id="polist_status" value="">
+                            </ul><!-- Filter List -->
+                        </div><!-- Feild -->
+                    </div><!-- Column -->
+                </div><!-- Row -->
             </div><!-- Modal Body -->
         </div><!-- Modal Content -->
     </div><!-- Modal Dialog -->
 </div><!-- Modal -->
-<!-- Modal -->
-<div class="modal fade alert-modal failure" id="delete_Coupon" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">ARE YOU SURE?</h4>
-            </div>
-            <div class="modal-body">
-                <h5>Delete</h5>
-                <p>You can’t retrive the data again, Are you sure you want to delete? </p>
-                <input type="hidden" name="Coupon_id" id="Coupon_id" value="">
-                <button class="btn btn-grey" data-dismiss="modal" aria-label="Close">Cancel</button>
-                <button class="btn btn-rose" ng-click="deleteConfirm()" type="button" data-dismiss="modal" aria-label="Close">Yes</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
