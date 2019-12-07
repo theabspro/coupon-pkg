@@ -20,53 +20,41 @@ class CouponController extends Controller {
 	public function getCouponList(Request $request) {
 		$Coupon_list = Coupon::withTrashed()
 			->select(
-				'Coupons.id',
-				'Coupons.code',
-				'Coupons.name',
-				DB::raw('IF(Coupons.mobile_no IS NULL,"--",Coupons.mobile_no) as mobile_no'),
-				DB::raw('IF(Coupons.email IS NULL,"--",Coupons.email) as email'),
-				DB::raw('IF(Coupons.deleted_at IS NULL,"Active","Inactive") as status')
+				'coupons.id',
+				'coupons.code',
+				'coupons.point',
+				DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
+				DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date')
 			)
-			->where('Coupons.company_id', Auth::user()->company_id)
-			->where(function ($query) use ($request) {
-				if (!empty($request->Coupon_code)) {
-					$query->where('Coupons.code', 'LIKE', '%' . $request->Coupon_code . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->Coupon_name)) {
-					$query->where('Coupons.name', 'LIKE', '%' . $request->Coupon_name . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->mobile_no)) {
-					$query->where('Coupons.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
-				}
-			})
-			->where(function ($query) use ($request) {
-				if (!empty($request->email)) {
-					$query->where('Coupons.email', 'LIKE', '%' . $request->email . '%');
-				}
-			})
-			->orderby('Coupons.id', 'desc');
+			->where('coupons.company_id', Auth::user()->company_id)
+		// ->where(function ($query) use ($request) {
+		// 	if (!empty($request->Coupon_code)) {
+		// 		$query->where('Coupons.code', 'LIKE', '%' . $request->Coupon_code . '%');
+		// 	}
+		// })
+		// ->where(function ($query) use ($request) {
+		// 	if (!empty($request->Coupon_name)) {
+		// 		$query->where('Coupons.name', 'LIKE', '%' . $request->Coupon_name . '%');
+		// 	}
+		// })
+		// ->where(function ($query) use ($request) {
+		// 	if (!empty($request->mobile_no)) {
+		// 		$query->where('Coupons.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
+		// 	}
+		// })
+		// ->where(function ($query) use ($request) {
+		// 	if (!empty($request->email)) {
+		// 		$query->where('Coupons.email', 'LIKE', '%' . $request->email . '%');
+		// 	}
+		// })
+			->orderby('coupons.id', 'desc');
 
 		return Datatables::of($Coupon_list)
-			->addColumn('code', function ($Coupon_list) {
-				$status = $Coupon_list->status == 'Active' ? 'green' : 'red';
-				return '<span class="status-indicator ' . $status . '"></span>' . $Coupon_list->code;
-			})
 			->addColumn('action', function ($Coupon_list) {
-				$edit_img = asset('public/theme/img/table/cndn/edit.svg');
-				$delete_img = asset('public/theme/img/table/cndn/delete.svg');
-				return '
-					<a href="#!/Coupon-pkg/Coupon/edit/' . $Coupon_list->id . '">
-						<img src="' . $edit_img . '" alt="View" class="img-responsive">
-					</a>
-					<a href="javascript:;" data-toggle="modal" data-target="#delete_Coupon"
-					onclick="angular.element(this).scope().deleteCoupon(' . $Coupon_list->id . ')" dusk = "delete-btn" title="Delete">
-					<img src="' . $delete_img . '" alt="delete" class="img-responsive">
-					</a>
-					';
+				$img2 = asset('public/img/content/table/eye.svg');
+				$img2_active = asset('public/img/content/table/eye-active.svg');
+
+				return '<a href="#!/coupon-pkg/coupon/view/' . $Coupon_list->id . '" id = "" ><img src="' . $img2 . '" alt="View" class="img-responsive add" onmouseover=this.src="' . $img2_active . '" onmouseout=this.src="' . $img2 . '"></a>';
 			})
 			->make(true);
 	}
