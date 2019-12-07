@@ -15,8 +15,8 @@ class CouponController extends Controller {
 
 	public function getCoupon(Request $request) {
 		$validator = Validator::make($request->all(), [
-			'coupon_code' => 'required|string',
 			'user_id' => 'required|numeric',
+			'coupon_code' => 'required|string',
 		]);
 		if ($validator->fails()) {
 			return response()->json([
@@ -33,13 +33,13 @@ class CouponController extends Controller {
 		]);
 	}
 
-	public function redeemCoupons(Request $request) {
+	public function redeemCoupon(Request $request) {
 		try {
 			$validator = Validator::make($request->all(), [
-				'user_id' => 'required|numeric',
-				'customer_id' => 'required|numeric',
-				'coupon_codes' => 'required|array',
-				'item_ids' => 'required|array',
+				'claim_initiated_by_id' => 'required|numeric',
+				'claimed_to_id' => 'required|numeric',
+				'coupon_id' => 'required|numeric',
+				'item_id' => 'required|numeric',
 			]);
 			if ($validator->fails()) {
 				return response()->json([
@@ -51,10 +51,10 @@ class CouponController extends Controller {
 
 			DB::beginTransaction();
 			//Validate user id existance and redeem permission
-			//Validate customer id existance
-			//Validate each coupon code existance and new status
-			//Validate each item ids existance
-			//update status of each coupon to claimed status and update other details
+			//Validate customer user id existance and check its user type
+			//Validate coupon id existance and new status
+			//Validate item id existance
+			//update status of coupon to claimed status and update other claimed details
 			DB::commit();
 
 			$coupon = new Coupon;
