@@ -107,11 +107,15 @@ class CouponController extends Controller {
 					'error' => 'Item ID not found',
 				], $this->successStatus);
 			}
-
+			$customer_user_id = MpayCustomerDetail::select('mpay_customer_details.*', 'users.id as customer_user_id')
+				->leftJoin('users', 'users.entity_id', 'mpay_customer_details.id')
+				->where('mpay_customer_details.id', $request->claimed_to_id)
+				->first();
+			// dd($customer_user_id->customer_user_id);
 			$current_date = date('Y-m-d H:i:s');
 			$coupon->status_id = 7401; //Claimed
 			$coupon->claim_initiated_by_id = $request->claim_initiated_by_id;
-			$coupon->claimed_to_id = $request->claimed_to_id;
+			$coupon->claimed_to_id = $customer_user_id->customer_user_id;
 			$coupon->claimed_date = $current_date;
 			$coupon->updated_by_id = $request->claim_initiated_by_id;
 			$coupon->updated_at = $current_date;
