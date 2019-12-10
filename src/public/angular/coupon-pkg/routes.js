@@ -8,7 +8,7 @@ app.config(['$routeProvider', function($routeProvider) {
     }).
     when('/coupon-pkg/coupon/view/:id', {
         template: '<coupon-view></coupon-view>',
-        title: 'Coupon',
+        title: 'Coupon Code View',
     }).
     when('/coupon-pkg/claimed-coupons', {
         template: '<claimed-coupons></claimed-coupons>',

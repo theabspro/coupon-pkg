@@ -1,5 +1,5 @@
 <div class="content-wrap pb-80" id="filter_invoice">
-    <table class="table table-striped table-fixed-header" id="po_table">
+    <table class="table table-striped table-fixed-header" id="coupon_code_table">
         <thead>
             <tr>
                 <th class="actions">Actions</th>
@@ -18,7 +18,7 @@
         </div>
     </div>
 </div><!-- Responsive -->
-<div class="modal fade modal-filter" id="po-filter" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade modal-filter" id="coupon-code-filter" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -75,22 +75,10 @@
                                             <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-partial" value="2">
                                             <label class="yellow" for="checkbox-partial">Partial</label>
                                         </div>
-                                        <!--   <div class="filter-checkbox-option">
-                                        <input type="checkbox" id="checkbox-partial-return">
-                                        <label class="yellow" for="checkbox-partial-return">Partial Return</label>
-                                    </div> -->
                                         <div class="filter-checkbox-option">
                                             <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-completed" value="3">
                                             <label class="green" for="checkbox-completed">Completed</label>
                                         </div>
-                                        <!--  <div class="filter-checkbox-option">
-                                        <input type="checkbox" id="checkbox-invoiced">
-                                        <label for="checkbox-invoiced">Invoiced</label>
-                                    </div>
-                                    <div class="filter-checkbox-option">
-                                        <input type="checkbox" id="checkbox-dispatched">
-                                        <label for="checkbox-dispatched">Dispatched</label>
-                                    </div> -->
                                     </div><!-- Filter Checkbox -->
                                 </li>
                                 <input type="hidden" name="polist_status[]" id="polist_status" value="">
