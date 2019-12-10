@@ -141,7 +141,7 @@ class CouponController extends Controller {
 			$validator = Validator::make($request->all(), [
 				'claim_initiated_by_id' => 'required|numeric',
 				'claimed_to_id' => 'required|numeric',
-				'coupon_ids.*' => 'required',
+				'coupon_id.*' => 'required',
 			]);
 			if ($validator->fails()) {
 				return response()->json([
@@ -151,10 +151,8 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 			DB::beginTransaction();
-			$user_validation = User::select('mpay_customer_details.customer_name as executive_name')
-				->where('users.id', $request->claim_initiated_by_id)
+			$user_validation = User::where('users.id', $request->claim_initiated_by_id)
 				->where('users.user_type_id', 6)
-				->leftJoin('mpay_customer_details', 'mpay_customer_details.id', 'users.entity_id')
 				->first();
 			if (!$user_validation) {
 				return response()->json([
@@ -163,7 +161,8 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 
-			$customer_validation = MpayCustomerDetail::where('id', $request->claimed_to_id)->first();
+			$customer_validation = User::where('users.id', $request->claimed_to_id)
+				->where('users.user_type_id', 7)->first();
 			if (!$customer_validation) {
 				return response()->json([
 					'success' => false,
@@ -171,13 +170,15 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 
-			$coupon_id = explode(',', $request->coupon_ids[0]);
 			$errors = [];
 			$total_points = [];
-			foreach ($coupon_id as $coupon) {
+			foreach ($request->coupon_id as $coupon) {
 				$coupon_id_check = Coupon::select(
-					'point'
+					'coupons.point',
+					'executive.customer_name'
 				)
+					->join('users', 'users.id', 'coupons.claim_initiated_by_id')
+					->join('mpay_customer_details as executive', 'executive.id', 'users.entity_id')
 					->where('coupons.id', $coupon)
 					->where('coupons.status_id', 7401)
 					->first();
@@ -196,7 +197,7 @@ class CouponController extends Controller {
 			if ($coupon_id_check) {
 				return response()->json([
 					'success' => true,
-					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption to your account by ' . $user_validation->executive_name,
+					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption to your account by ' . $coupon_id_check->customer_name,
 				], $this->successStatus);
 			}
 
