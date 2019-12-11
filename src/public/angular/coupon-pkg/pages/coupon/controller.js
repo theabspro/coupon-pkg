@@ -36,7 +36,7 @@ app.component('couponCodes', {
                 },
             },
             columns: [
-                { data: 'action', class:'action', searchable: false },
+                { data: 'action', class: 'action', searchable: false },
                 { data: 'code', name: 'coupons.code' },
                 { data: 'printed_date', name: 'coupons.date', searchable: false },
                 { data: 'point', name: 'coupons.point' },
@@ -53,13 +53,13 @@ app.component('couponCodes', {
             }
         });
         /* Page Title Appended */
-        $('.page-header-content .display-inline-block .data-table-title').html('COUPON CODES <span class="badge badge-secondary" id="table_info">0</span>');
-        $('.page-header-content .search.display-inline-block .add_close_button').html('<button type="button" class="btn btn-img btn-add-close"><img src="'+ image_scr2 +'" class="img-responsive"></button>');
-        $('.page-header-content .refresh.display-inline-block').html('<button type="button" class="btn btn-refresh"><img src="'+ image_scr3 +'" class="img-responsive"></button>');
+        $('.page-header-content .display-inline-block .data-table-title').html('Coupon Codes <span class="badge badge-secondary" id="table_info">0</span>');
+        $('.page-header-content .search.display-inline-block .add_close_button').html('<button type="button" class="btn btn-img btn-add-close"><img src="' + image_scr2 + '" class="img-responsive"></button>');
+        $('.page-header-content .refresh.display-inline-block').html('<button type="button" class="btn btn-refresh"><img src="' + image_scr3 + '" class="img-responsive"></button>');
 
         var addnew_block = $('#add_new_wrap').html();
         $('.page-header-content .alignment-right .add_new_button').html('<a role="button" id="open" data-toggle="modal"  data-target="#coupon-code-filter" class="btn btn-img"> <img src="' + image_scr + '" alt="Filter" onmouseover="this.src=' + image_scr1 + '" onmouseout="this.src=' + image_scr + '"></a>' +
-        addnew_block);
+            addnew_block);
 
         $('.btn-add-close').on("click", function() {
             $('#coupon_code_table').DataTable().search('').draw();
@@ -83,8 +83,8 @@ app.component('couponView', {
         $http.get(
             coupon_code_view_url + '/' + $routeParams.id
         ).then(function(response) {
-            // console.log(response.data);
-            self.Coupon_code = response.data.Coupon_code;
+            // console.log(response);
+            self.coupon_code = response.data.coupon_code;
             $rootScope.loading = false;
         });
 

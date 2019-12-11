@@ -56,14 +56,27 @@ class CouponController extends Controller {
 
 	public function couponCodeView($id) {
 
-		$Coupon_code = Coupon::select(
-			'coupons.*',
-			'payments.*'
+		$this->data['coupon_code'] = $Coupon_code = Coupon::select(
+			'coupons.code',
+			'coupons.point',
+			DB::raw('DATE_FORMAT(coupons.date,"%d/%m/%Y") as date'),
+			DB::raw('DATE_FORMAT(coupons.updated_at,"%d/%m/%Y") as updated_date'),
+			DB::raw('DATE_FORMAT(coupons.claimed_date,"%d/%m/%Y") as climed_date'),
+			'configs.name as status',
+			'mpay_employee_details.employee_name as clime_initiated_by',
+			'mpay_employee_details.employee_code as clime_initiated_by_code',
+			'mpay_customer_details.customer_name as claimed_to',
+			'mpay_customer_details.customer_code as claimed_to_code'
+			// 'payments.*'
 		)
+			->leftJoin('configs', 'configs.id', 'coupons.status_id')
+			->leftJoin('users', 'users.id', 'coupons.claim_initiated_by_id')
+			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
+			->leftJoin('users as customer', 'customer.id', 'coupons.claimed_to_id')
+			->leftJoin('mpay_customer_details', 'mpay_customer_details.id', 'customer.entity_id')
 			->leftJoin('payments', 'payments.id', 'coupons.payment_id')
 			->where('coupons.id', $id)
 			->first();
-		// dd($Coupon_code);
-		return response()->json($Coupon_code);
+		return response()->json($this->data);
 	}
 }

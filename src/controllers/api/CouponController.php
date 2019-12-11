@@ -113,7 +113,7 @@ class CouponController extends Controller {
 				->where('mpay_customer_details.id', $request->claimed_to_id)
 				->first();
 			// dd($customer_user_id->customer_user_id);
-			$current_date = date('Y-m-d H:i:s');
+			$current_date = Carbon::now();
 			$coupon->status_id = 7401; //Claimed
 			$coupon->claim_initiated_by_id = $request->claim_initiated_by_id;
 			$coupon->claimed_to_id = $customer_user_id->customer_user_id;
@@ -126,7 +126,7 @@ class CouponController extends Controller {
 				'success' => true,
 				'message' => 'Coupons redeemed successfully!',
 			]);
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			return response()->json([
 				'success' => false,
 				'error' => 'Server Network Down!',
@@ -151,7 +151,6 @@ class CouponController extends Controller {
 					'errors' => $validator->errors()->all(),
 				], $this->successStatus);
 			}
-			DB::beginTransaction();
 			$user_validation = User::where('users.id', $request->claim_initiated_by_id)
 				->where('users.user_type_id', 6)
 				->first();
@@ -178,7 +177,8 @@ class CouponController extends Controller {
 					'coupons.point',
 					'executive.employee_name',
 					'executive.id as employee_id',
-					'mpay_customer_details.mobile_number'
+					'mpay_customer_details.mobile_number',
+					'mpay_customer_details.id as customer_id'
 				)
 					->join('users', 'users.id', 'coupons.claim_initiated_by_id')
 					->join('mpay_employee_details as executive', 'executive.id', 'users.entity_id')
@@ -188,7 +188,7 @@ class CouponController extends Controller {
 					->where('coupons.status_id', 7401)
 					->first();
 				if (!$coupon_id_check) {
-					$errors[] = "Coupon ID: " . $coupon . " is doesn't Used";
+					$errors[] = "Coupon ID: " . $coupon . " doesn't scanned";
 				} else {
 					$total_points[] = $coupon_id_check->point;
 				}
@@ -200,22 +200,21 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 			if ($coupon_id_check) {
-				// $mobile_number = $coupon_id_check->mobile_number;
+				$mobile_number = $coupon_id_check->mobile_number;
 
-				// $message = config('custom.SMS_TEMPLATES.COUPON_ALERT');
-				// $args = ['total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
-				// $message = vsprintf($message, $args);
+				$message = config('custom.SMS_TEMPLATES.COUPON_ALERT');
+				$args = ['total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
+				$message = vsprintf($message, $args);
 
-				// if (!empty($mobile_number) && $mobile_number != 7777777777) {
-				// 	$res = $this->sendsms($coupon_id_check->mobile_number, $message, $request->claimed_to_id, $coupon_id_check->employee_id);
-				// }
+				if (!empty($mobile_number) && $mobile_number != 7777777777) {
+					$res = $this->sendsms($coupon_id_check->mobile_number, $message, $coupon_id_check->customer_id, $coupon_id_check->employee_id);
+				}
 				return response()->json([
 					'success' => true,
-					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption to your account by ' . $coupon_id_check->employee_name,
+					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption added to your account by ' . $coupon_id_check->employee_name,
 				], $this->successStatus);
 			}
-
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			return response()->json([
 				'success' => false,
 				'error' => 'Server Network Down!',
@@ -241,16 +240,12 @@ class CouponController extends Controller {
 		$message_id = curl_exec($ch);
 		curl_close($ch);
 		if (!empty($message_id)) {
-			$sms_insert = \DB::table('mpay_sent_sms_details')->insert(
-				['customer_id' => $customer_id, 'employee_id' => $employee_id, 'sender_id' => $sms_sender_id, 'message' => $message, 'message_id' => $message_id, 'mobile_number' => $mobile_number, 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]
+			$sms_insert = DB::table('mpay_sent_sms_details')->insert(
+				['customer_id' => $customer_id, 'employee_id' => $employee_id, 'sender_id' => $sms_sender_id, 'message' => $message, 'message_id' => $message_id, 'mobile_number' => $mobile_number, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
 			);
 		}
-		if ($sms_insert == true) {
+		if ($sms_insert) {
 			return true;
-		} else {
-			return false;
 		}
-
 	}
-
 }
