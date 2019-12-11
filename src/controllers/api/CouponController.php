@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\ItemDetail;
 use App\MpayCustomerDetail;
 use App\User;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use Validator;
@@ -175,10 +176,14 @@ class CouponController extends Controller {
 			foreach ($request->coupon_id as $coupon) {
 				$coupon_id_check = Coupon::select(
 					'coupons.point',
-					'executive.customer_name'
+					'executive.employee_name',
+					'executive.id as employee_id',
+					'mpay_customer_details.mobile_number'
 				)
 					->join('users', 'users.id', 'coupons.claim_initiated_by_id')
-					->join('mpay_customer_details as executive', 'executive.id', 'users.entity_id')
+					->join('mpay_employee_details as executive', 'executive.id', 'users.entity_id')
+					->join('users as customer', 'customer.id', 'coupons.claimed_to_id')
+					->join('mpay_customer_details', 'mpay_customer_details.id', 'customer.entity_id')
 					->where('coupons.id', $coupon)
 					->where('coupons.status_id', 7401)
 					->first();
@@ -195,9 +200,18 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 			if ($coupon_id_check) {
+				// $mobile_number = $coupon_id_check->mobile_number;
+
+				// $message = config('custom.SMS_TEMPLATES.COUPON_ALERT');
+				// $args = ['total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
+				// $message = vsprintf($message, $args);
+
+				// if (!empty($mobile_number) && $mobile_number != 7777777777) {
+				// 	$res = $this->sendsms($coupon_id_check->mobile_number, $message, $request->claimed_to_id, $coupon_id_check->employee_id);
+				// }
 				return response()->json([
 					'success' => true,
-					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption to your account by ' . $coupon_id_check->customer_name,
+					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption to your account by ' . $coupon_id_check->employee_name,
 				], $this->successStatus);
 			}
 
@@ -211,4 +225,32 @@ class CouponController extends Controller {
 			]);
 		}
 	}
+
+	public function sendsms($mobile_number, $message, $customer_id, $employee_id) {
+		$sms_url = config('custom.sms_url');
+		$sms_user = config('custom.sms_user');
+		$sms_password = config('custom.sms_password');
+		$sms_sender_id = config('custom.sms_sender_id_tvsrpt');
+
+		$file_content = $sms_url . 'uname=' . $sms_user . '&pass=' . $sms_password . '&send=' . $sms_sender_id . '&dest=91' . $mobile_number . '&msg=' . urlencode($message);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $file_content);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$message_id = curl_exec($ch);
+		curl_close($ch);
+		if (!empty($message_id)) {
+			$sms_insert = \DB::table('mpay_sent_sms_details')->insert(
+				['customer_id' => $customer_id, 'employee_id' => $employee_id, 'sender_id' => $sms_sender_id, 'message' => $message, 'message_id' => $message_id, 'mobile_number' => $mobile_number, 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]
+			);
+		}
+		if ($sms_insert == true) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
 }
