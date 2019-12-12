@@ -161,8 +161,13 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 
-			$customer_validation = User::where('users.id', $request->claimed_to_id)
-				->where('users.user_type_id', 7)->first();
+			// $customer_validation = User::where('users.id', $request->claimed_to_id)
+			// 	->where('users.user_type_id', 7)->first();
+			$customer_validation = MpayCustomerDetail::join('users', 'users.entity_id', 'mpay_customer_details.id')
+				->where('mpay_customer_details.id', $request->claimed_to_id)
+				->where('users.user_type_id', 7)
+				->first();
+
 			if (!$customer_validation) {
 				return response()->json([
 					'success' => false,
