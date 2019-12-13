@@ -97,7 +97,7 @@ class CouponController extends Controller {
 			if (!$coupon) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Coupon ID not found',
+					'error' => 'Coupon ID redeem already',
 				], $this->successStatus);
 			}
 
@@ -114,7 +114,7 @@ class CouponController extends Controller {
 				->first();
 			// dd($customer_user_id->customer_user_id);
 			$current_date = Carbon::now();
-			$coupon->status_id = 7401; //Claimed
+			//$coupon->status_id = 7401; //Claimed //changed for testing purpose
 			$coupon->claim_initiated_by_id = $request->claim_initiated_by_id;
 			$coupon->claimed_to_id = $customer_user_id->customer_user_id;
 			$coupon->claimed_date = $current_date;
