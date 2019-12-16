@@ -16,12 +16,15 @@ class CouponController extends Controller {
 	public function getCouponList(Request $request) {
 		$Coupon_list = Coupon::select(
 			'coupons.id',
-			'coupons.code',
-			'coupons.point',
 			DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
-			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date')
+			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date'),
+			DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
+			DB::raw('COUNT(coupons.id) as coupons_count')
 		)
+			->leftJoin('users', 'users.id', 'coupons.created_by_id')
+			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
 			->where('coupons.company_id', Auth::user()->company_id)
+		// ->where('users.user_type_id', 6)
 		// ->where(function ($query) use ($request) {
 		// 	if (!empty($request->Coupon_code)) {
 		// 		$query->where('Coupons.code', 'LIKE', '%' . $request->Coupon_code . '%');
@@ -42,7 +45,8 @@ class CouponController extends Controller {
 		// 		$query->where('Coupons.email', 'LIKE', '%' . $request->email . '%');
 		// 	}
 		// })
-			->orderby('coupons.id', 'desc');
+			->groupBy('coupons.date');
+		// ->orderby('coupons.id', 'desc');
 
 		return Datatables::of($Coupon_list)
 			->addColumn('action', function ($Coupon_list) {
