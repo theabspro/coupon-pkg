@@ -79,4 +79,8 @@ class CouponController extends Controller {
 			->first();
 		return response()->json($this->data);
 	}
+
+	public function importCouponCodes(Request $r) {
+		return ImportJob::createImportJob($r);
+	}
 }
