@@ -4,7 +4,7 @@ app.component('couponCodes', {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
-
+        alert(laravel_routes['getCouponList']);
         var table = $('#coupon_code_table').DataTable({
             "dom": dom_structure,
             info: true,
@@ -30,16 +30,13 @@ app.component('couponCodes', {
                 data: function(d) {
                     // d.start_date = $('#start_date').val();
                     // d.end_date = $('#end_date').val();
-                    // d.polist_status = $("#polist_status").val();
-                    // d.warehouse_id = $('.warehouse_id').val();
-                    // d.supplier_id = $('.supplier_id').val();
                 },
             },
             columns: [
                 { data: 'action', class: 'action', searchable: false },
-                { data: 'code', name: 'coupons.code' },
+                { data: 'coupons_count', name: 'coupons_count', searchable: false },
                 { data: 'printed_date', name: 'coupons.date', searchable: false },
-                { data: 'point', name: 'coupons.point' },
+                { data: 'uploaded_by', name: 'mpay_employee_details.employee_name', searchable: false },
                 { data: 'uploaded_date', name: 'coupons.created_at', searchable: false },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
