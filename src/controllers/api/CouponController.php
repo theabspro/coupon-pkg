@@ -114,7 +114,7 @@ class CouponController extends Controller {
 				->first();
 			// dd($customer_user_id->customer_user_id);
 			$current_date = Carbon::now();
-			//$coupon->status_id = 7401; //Claimed //changed for testing purpose
+			$coupon->status_id = 7401; //Claimed
 			$coupon->claim_initiated_by_id = $request->claim_initiated_by_id;
 			$coupon->claimed_to_id = $customer_user_id->customer_user_id;
 			$coupon->claimed_date = $current_date;
