@@ -4,7 +4,6 @@ app.component('couponCodes', {
         $scope.loading = true;
         var self = this;
         self.hasPermission = HelperService.hasPermission;
-        alert(laravel_routes['getCouponList']);
         var table = $('#coupon_code_table').DataTable({
             "dom": dom_structure,
             info: true,
