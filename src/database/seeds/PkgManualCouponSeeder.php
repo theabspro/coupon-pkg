@@ -39,6 +39,7 @@ class PkgManualCouponSeeder extends Seeder {
 				'point' => $points,
 				'status_id' => 7400,
 				'created_by_id' => $admin->id,
+				'updated_at' => NULL,
 			]);
 		}
 

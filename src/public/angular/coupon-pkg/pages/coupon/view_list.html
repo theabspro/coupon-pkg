@@ -1,0 +1,68 @@
+<!--Content Wrap -->
+<div class="content-wrap">
+    <div class="page-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header-content">
+                        <div class="page-header-inner page-title display-inline-block">
+                            <div class="previous-page">
+                                <a href="#!/coupon-pkg/coupons"><img src="./public/img/content/previous.svg" class="img-responsive"></a>
+                            </div>
+                        </div><!-- Page Header Inner -->
+                        <div class="page-header-inner page-title display-inline-block">
+                            <h3 class="title">Coupon Codes</h3>
+                        </div><!-- Page Header Inner -->
+                    </div><!-- Page Header Content -->
+                </div><!-- Col Main -->
+            </div><!-- Row -->
+        </div><!-- Container -->
+    </div><!-- Page Header -->
+    <!-- Page Main Content -->
+    <div class="page-main-content pb-80">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="view-page">
+                        <div class="view-page-details">
+                            <ul class="view-list-item">
+                                <li>
+                                    <label>Coupons</label>
+                                    <p>{{$ctrl.coupon_code.coupons_count}}</p>
+                                </li>
+                                <li>
+                                    <label>Printed Date</label>
+                                    <p>{{$ctrl.coupon_code.printed_date}}</p>
+                                </li>
+                                <li>
+                                    <label>Uploaded By</label>
+                                    <p>{{$ctrl.coupon_code.uploaded_by}}</p>
+                                </li>
+                                <li>
+                                    <label>Uploaded Date</label>
+                                    <p>{{$ctrl.coupon_code.uploaded_date}}</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <hr>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-fixed-header" id="coupon_code_list_table">
+                                <thead>
+                                    <tr>
+                                        <th class="actions">Actions</th>
+                                        <th>Coupon Code</th>
+                                        <th>Coupon Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <div class="hide">
+                            </div>
+                        </div><!-- Responsive -->
+                    </div><!-- View Page -->
+                </div><!-- Column -->
+            </div><!-- Row -->
+        </div><!-- Container -->
+    </div><!-- Page Main Content -->
+</div><!-- Content Wrap -->

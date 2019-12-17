@@ -6,7 +6,11 @@ app.config(['$routeProvider', function($routeProvider) {
         template: '<coupon-codes></coupon-codes>',
         title: 'Coupon Codes',
     }).
-    when('/coupon-pkg/coupon/view/:id', {
+    when('/coupon-pkg/coupon/view/:date', {
+        template: '<coupon-codes-view></coupon-codes-view>',
+        title: 'Coupon Code View',
+    }).
+    when('/coupon-pkg/coupon/view/:date/:id', {
         template: '<coupon-view></coupon-view>',
         title: 'Coupon Code View',
     }).

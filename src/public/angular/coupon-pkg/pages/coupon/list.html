@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th class="actions">Actions</th>
-                <th>Coupon</th>
+                <th>Coupons</th>
                 <th>Printed Date</th>
                 <th>Uploaded By</th>
                 <th>Uploaded Date</th>
@@ -26,14 +26,20 @@
                     <img src="./public/img/content/modal/close-circle.svg" alt="colse" class="img-responsive" onmouseover="this.src='./public/img/content/modal/close-circle-active.svg'" onmouseout="this.src='./public/img/content/modal/close-circle.svg'">
                 </button>
                 <h5 class="modal-title">Filter</h5>
+                <div class="filter-reset">
+                    <p class="text-red" ng-click="reset_filter()">Reset Filter</p>
+                </div>
             </div><!-- Modal Header -->
             <div class="modal-body">
                 <div class="row">
+                    <div class="col-sm-12">
+                        <label>Printed Date</label>
+                    </div>
                     <div class="col-sm-6">
                         <div class="input-text form-group">
                             <label>From</label>
                             <div class="input-group date btwn-img" data-provide="datepicker">
-                                <input type="text" class="form-control date_filter" id="start_date" placeholder="Select From Date" aria-invalid="false" />
+                                <input type="text" class="form-control date_filter" id="print_start_date" placeholder="Select From Date" aria-invalid="false" />
                                 <div class="input-group-addon">
                                     <img class="img-responsive date_filter" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
                                 </div>
@@ -44,7 +50,7 @@
                         <div class="input-text form-group">
                             <label>To</label>
                             <div class="input-group date" data-provide="datepicker">
-                                <input type="text" class="form-control date_filter" id="end_date" placeholder="Select To Date" aria-invalid="false" />
+                                <input type="text" class="form-control date_filter" id="print_end_date" placeholder="Select To Date" aria-invalid="false" />
                                 <div class="input-group-addon">
                                     <img class="img-responsive" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
                                 </div>
@@ -53,37 +59,30 @@
                     </div><!-- Column -->
                 </div><!-- Row -->
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group input-text">
-                            <label>Status</label>
-                            <ul class="filter-list">
-                                <li>
-                                    <div class="filter-checkbox po_filter">
-                                        <div class="filter-checkbox-option">
-                                            <input type="checkbox" class="filter-checkbox-option" id="checkbox-all" name="status[]" value="all">
-                                            <label for="checkbox-all">All</label>
-                                        </div>
-                                    </div><!-- Filter Checkbox -->
-                                </li>
-                                <li>
-                                    <div class="filter-checkbox purchase_order">
-                                        <div class="filter-checkbox-option">
-                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-pending" value="1">
-                                            <label class="red" for="checkbox-pending">Pending</label>
-                                        </div>
-                                        <div class="filter-checkbox-option">
-                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-partial" value="2">
-                                            <label class="yellow" for="checkbox-partial">Partial</label>
-                                        </div>
-                                        <div class="filter-checkbox-option">
-                                            <input type="checkbox" class="filter-checkbox-option" name="status[]" id="checkbox-completed" value="3">
-                                            <label class="green" for="checkbox-completed">Completed</label>
-                                        </div>
-                                    </div><!-- Filter Checkbox -->
-                                </li>
-                                <input type="hidden" name="polist_status[]" id="polist_status" value="">
-                            </ul><!-- Filter List -->
-                        </div><!-- Feild -->
+                    <div class="col-sm-12">
+                        <label>Uploaded Date</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="input-text form-group">
+                            <label>From</label>
+                            <div class="input-group date btwn-img" data-provide="datepicker">
+                                <input type="text" class="form-control date_filter" id="upload_start_date" placeholder="Select From Date" aria-invalid="false" />
+                                <div class="input-group-addon">
+                                    <img class="img-responsive date_filter" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
+                                </div>
+                            </div><!-- Input Group -->
+                        </div><!-- Field -->
+                    </div><!-- Column -->
+                    <div class="col-sm-6">
+                        <div class="input-text form-group">
+                            <label>To</label>
+                            <div class="input-group date" data-provide="datepicker">
+                                <input type="text" class="form-control date_filter" id="upload_end_date" placeholder="Select To Date" aria-invalid="false" />
+                                <div class="input-group-addon">
+                                    <img class="img-responsive" src="./public/img/content/calendar-icon.svg" alt="Calendar Image" />
+                                </div>
+                            </div><!-- Input Group -->
+                        </div><!-- Field -->
                     </div><!-- Column -->
                 </div><!-- Row -->
             </div><!-- Modal Body -->

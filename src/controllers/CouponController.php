@@ -16,6 +16,7 @@ class CouponController extends Controller {
 	public function getCouponList(Request $request) {
 		$Coupon_list = Coupon::select(
 			'coupons.id',
+			'coupons.date',
 			DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
 			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date'),
 			DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
@@ -24,42 +25,72 @@ class CouponController extends Controller {
 			->leftJoin('users', 'users.id', 'coupons.created_by_id')
 			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
 			->where('coupons.company_id', Auth::user()->company_id)
-		// ->where('users.user_type_id', 6)
-		// ->where(function ($query) use ($request) {
-		// 	if (!empty($request->Coupon_code)) {
-		// 		$query->where('Coupons.code', 'LIKE', '%' . $request->Coupon_code . '%');
-		// 	}
-		// })
-		// ->where(function ($query) use ($request) {
-		// 	if (!empty($request->Coupon_name)) {
-		// 		$query->where('Coupons.name', 'LIKE', '%' . $request->Coupon_name . '%');
-		// 	}
-		// })
-		// ->where(function ($query) use ($request) {
-		// 	if (!empty($request->mobile_no)) {
-		// 		$query->where('Coupons.mobile_no', 'LIKE', '%' . $request->mobile_no . '%');
-		// 	}
-		// })
-		// ->where(function ($query) use ($request) {
-		// 	if (!empty($request->email)) {
-		// 		$query->where('Coupons.email', 'LIKE', '%' . $request->email . '%');
-		// 	}
-		// })
-			->groupBy('coupons.date');
-		// ->orderby('coupons.id', 'desc');
+			->where(function ($query) use ($request) {
+				if (!empty($request->print_start_date) && !empty($request->print_end_date)) {
+					$from = date('Y-m-d', strtotime($request->print_start_date));
+					$to = date('Y-m-d', strtotime($request->print_end_date));
+					$query->whereBetween('coupons.date', [$from, $to]);
+				}
+			})
+			->where(function ($query) use ($request) {
+				if (!empty($request->upload_start_date) && !empty($request->upload_end_date)) {
+					$from = date('Y-m-d', strtotime($request->upload_start_date));
+					$to = date('Y-m-d', strtotime($request->upload_end_date));
+					$query->whereBetween('coupons.created_at', [$from, $to]);
+				}
+			})
+			->groupBy('coupons.date')
+			->orderby('coupons.date', 'desc');
 
 		return Datatables::of($Coupon_list)
 			->addColumn('action', function ($Coupon_list) {
 				$img2 = asset('public/img/content/table/eye.svg');
 				$img2_active = asset('public/img/content/table/eye-active.svg');
 
-				return '<a href="#!/coupon-pkg/coupon/view/' . $Coupon_list->id . '" id = "" ><img src="' . $img2 . '" alt="View" class="img-responsive add" onmouseover=this.src="' . $img2_active . '" onmouseout=this.src="' . $img2 . '"></a>';
+				return '<a href="#!/coupon-pkg/coupon/view/' . $Coupon_list->date . '" id = "" ><img src="' . $img2 . '" alt="View" class="img-responsive add" onmouseover=this.src="' . $img2_active . '" onmouseout=this.src="' . $img2 . '"></a>';
 			})
 			->make(true);
 	}
 
-	public function couponCodeView($id) {
+	public function couponCodeListView($date) {
+		$this->data['coupon_code'] = $Coupon_code = Coupon::select(
+			'coupons.id',
+			DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
+			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date'),
+			DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
+			DB::raw('COUNT(coupons.id) as coupons_count')
+		)
+			->leftJoin('users', 'users.id', 'coupons.created_by_id')
+			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
+			->where('coupons.company_id', Auth::user()->company_id)
+			->where('coupons.date', $date)
+			->first();
 
+		return response()->json($this->data);
+	}
+
+	public function getCouponCodeList($date) {
+		$Coupon_code_list = Coupon::select(
+			'coupons.id',
+			'coupons.code',
+			'coupons.date',
+			'coupons.point'
+		)
+			->where('coupons.company_id', Auth::user()->company_id)
+			->where('coupons.date', $date)
+			->orderby('coupons.id', 'desc');
+		// dd($Coupon_code_list);
+		return Datatables::of($Coupon_code_list)
+			->addColumn('action', function ($Coupon_code_list) {
+				$img2 = asset('public/img/content/table/eye.svg');
+				$img2_active = asset('public/img/content/table/eye-active.svg');
+
+				return '<a href="#!/coupon-pkg/coupon/view/' . $Coupon_code_list->date . '/' . $Coupon_code_list->id . '" id = "" ><img src="' . $img2 . '" alt="View" class="img-responsive add" onmouseover=this.src="' . $img2_active . '" onmouseout=this.src="' . $img2 . '"></a>';
+			})
+			->make(true);
+	}
+
+	public function couponCodeView($date, $id) {
 		$this->data['coupon_code'] = $Coupon_code = Coupon::select(
 			'coupons.code',
 			'coupons.point',
