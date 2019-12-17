@@ -35,7 +35,7 @@ app.component('couponCodes', {
             },
             columns: [
                 { data: 'action', class: 'action', searchable: false },
-                { data: 'coupons_count', name: 'coupons_count', searchable: false, class: "text-rigth" },
+                { data: 'coupons_count', name: 'coupons_count', searchable: false, class: "text-right" },
                 { data: 'printed_date', name: 'coupons.date', searchable: false },
                 { data: 'uploaded_by', name: 'mpay_employee_details.employee_name', searchable: false },
                 { data: 'uploaded_date', name: 'coupons.created_at', searchable: false },
@@ -142,8 +142,8 @@ app.component('couponCodesView', {
             },
             columns: [
                 { data: 'action', class: 'action', searchable: false },
-                { data: 'code', name: 'coupons.code' },
-                { data: 'point', name: 'coupons.point' },
+                { data: 'code', name: 'coupons.code', class: 'text-right' },
+                { data: 'point', name: 'coupons.point', class: 'text-right' },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
                 $('#table_info').html(max)
