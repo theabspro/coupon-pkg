@@ -216,7 +216,8 @@ class CouponController extends Controller {
 				}
 				return response()->json([
 					'success' => true,
-					'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption added to your account by ' . $coupon_id_check->employee_name,
+					'message' => 'Coupon Redeemed Successfully',
+					// 'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption added to your account by ' . $coupon_id_check->employee_name,
 				], $this->successStatus);
 			}
 		} catch (Exception $e) {
