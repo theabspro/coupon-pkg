@@ -37,7 +37,7 @@ app.component('couponCodes', {
                 { data: 'action', class: 'action', searchable: false },
                 { data: 'coupons_count', name: 'coupons_count', searchable: false, class: "text-right" },
                 { data: 'printed_date', name: 'coupons.date', searchable: false },
-                { data: 'uploaded_by', name: 'mpay_employee_details.employee_name', searchable: false },
+                { data: 'uploaded_by', name: 'mpay_employee_details.employee_name' },
                 { data: 'uploaded_date', name: 'coupons.created_at', searchable: false },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
