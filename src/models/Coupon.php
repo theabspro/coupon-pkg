@@ -10,19 +10,19 @@ use Excel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PHPExcel_IOFactory;
+use PHPExcel_Shared_Date;
 
 class Coupon extends Model {
 	use SoftDeletes;
 	use SeederTrait;
 	protected $table = 'coupons';
 	protected $fillable = [
-		'code',
-		'name',
-		'cust_group',
-		'dimension',
-		'mobile_no',
-		'email',
 		'company_id',
+		'code',
+		'date',
+		'point',
+		'status_id',
+		'created_by_id',
 	];
 
 	public static function importFromExcel($job) {
@@ -52,14 +52,13 @@ class Coupon extends Model {
 		$total_records = $highestRow - 1;
 		$job->total_record_count = $total_records;
 		$job->remaining_count = $total_records;
-		// $job->status_id = 7201; //Inprogress
+		$job->status_id = 7201; //Inprogress
 		$job->save();
 
 		$all_error_records = [];
 		$error_msg = $status = $records = '';
 		$sr_no = 0;
 		foreach ($rows as $k => $row) {
-			// DB::beginTransaction();
 			$record = [];
 			foreach ($header as $key => $column) {
 				if (!$column) {
@@ -74,23 +73,23 @@ class Coupon extends Model {
 			$status = [];
 			$status['errors'] = [];
 
-			if (empty($record['date_of_printing'])) {
+			if (empty($record['Code'])) {
 				$status['errors'][] = 'Date of printing is empty';
 			} else {
 				$coupon = Coupon::where([
-					'company_id' => $job->id,
-					'code' => $record['coupon_code'],
+					'company_id' => $job->company_id,
+					'code' => $record['Code'],
 				])->first();
 				if ($coupon) {
 					$status['errors'][] = 'Duplicate coupon code';
 				}
 			}
 
-			if (empty($record['date_of_printing'])) {
+			if (empty($record['Date of Printing'])) {
 				$status['errors'][] = 'Date of printing is empty';
 			}
 
-			if (empty($record['points'])) {
+			if (empty($record['Point'])) {
 				$status['errors'][] = 'Point is empty';
 			}
 
@@ -104,38 +103,40 @@ class Coupon extends Model {
 			}
 
 			$coupon = Coupon::create([
-				'company_id' => $job->id,
-				'code' => $record['coupon_code'], //ITEM
-				'date' => date('Y-m-d', strtotime($record['date_of_printing'])),
-				'point' => $record['point'],
+				'company_id' => $job->company_id,
+				'code' => $record['Code'], //ITEM
+				'date' => date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($record['Date of Printing'])),
+				'point' => $record['Point'],
 				'status_id' => 7400,
 				'created_by_id' => $job->created_by_id,
 			]);
 
-			$newCount++;
+			$encrypted_qr_code = $coupon->code . ', ' . date('d-m-Y', strtotime($coupon->date));
+			$qr_code = base64_decode(DNS2D::getBarcodePNG($encrypted_qr_code, "QRCODE", 30, 30));
+			$result = Storage::put('public/wad-qr-coupons/' . $coupon->code . '.png', $qr_code);
+
+			$new_count++;
 
 			//UPDATING PROGRESS FOR EVERY FIVE RECORDS
-			// if (($k + 1) % 5 == 0) {
-			$job->new_count = $newCount;
-			$job->error_count = $error_count;
-			$job->remaining_count = $total_records - ($k + 1);
-			$job->processed_count = $k + 1;
-			$job->save();
-			// }
+			if (($k + 1) % 5 == 0) {
+				$job->new_count = $new_count;
+				$job->error_count = $error_count;
+				$job->remaining_count = $total_records - ($k + 1);
+				$job->processed_count = $k + 1;
+				$job->save();
+			}
 		}
 		if (count($all_error_records) > 0) {
 			$job->error_details = 'Error occured during import. Check the error report';
 		}
 
-		// $job->processed_count = $total_records;
-		// $job->processed_count = 0;
-		$job->new_count = $newCount;
-		$job->updated_count = $updatedcount;
+		$job->processed_count = $total_records;
+		$job->new_count = $new_count;
+		$job->updated_count = $updated_count;
 		$job->error_count = $error_count;
 		$job->status_id = 7202; //COMPLETED
 		$job->save();
 		DB::commit();
-		// dd($all_error_records);
 		if (count($all_error_records) > 0) {
 			Excel::load('storage/app/' . $job->output_file, function ($excel) use ($all_error_records, $job) {
 				$excel->sheet('Error Details', function ($sheet) use ($all_error_records) {
@@ -151,8 +152,9 @@ class Coupon extends Model {
 						}
 					}
 				});
-			})->store('xlsx', storage_path('app/' . $job->output_file));
+			})->store('xlsx', storage_path('app/' . $job->type->folder_path));
 		}
+		dump($all_error_records, 'Success. Total Record : ' . $new_count);
 
 	}
 
