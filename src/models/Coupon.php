@@ -34,7 +34,6 @@ class Coupon extends Model {
 		$sheet = $objPHPExcel->getSheet(0);
 		$highestRow = $sheet->getHighestDataRow();
 
-		DB::beginTransaction();
 		// $job->status_id = 7204; //Calculating Total Records
 		// $job->save();
 
@@ -59,6 +58,7 @@ class Coupon extends Model {
 		$error_msg = $status = $records = '';
 		$sr_no = 0;
 		foreach ($rows as $k => $row) {
+			DB::beginTransaction();
 			$record = [];
 			foreach ($header as $key => $column) {
 				if (!$column) {
@@ -125,6 +125,7 @@ class Coupon extends Model {
 				$job->processed_count = $k + 1;
 				$job->save();
 			}
+			DB::commit();
 		}
 		if (count($all_error_records) > 0) {
 			$job->error_details = 'Error occured during import. Check the error report';
@@ -136,7 +137,6 @@ class Coupon extends Model {
 		$job->error_count = $error_count;
 		$job->status_id = 7202; //COMPLETED
 		$job->save();
-		DB::commit();
 		if (count($all_error_records) > 0) {
 			Excel::load('storage/app/' . $job->output_file, function ($excel) use ($all_error_records, $job) {
 				$excel->sheet('Error Details', function ($sheet) use ($all_error_records) {
