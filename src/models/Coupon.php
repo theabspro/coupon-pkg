@@ -5,8 +5,11 @@ namespace Abs\CouponPkg;
 use Abs\HelperPkg\Traits\SeederTrait;
 use App\Company;
 use App\Config;
+use DB;
+use Excel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPExcel_IOFactory;
 
 class Coupon extends Model {
 	use SoftDeletes;
@@ -21,6 +24,137 @@ class Coupon extends Model {
 		'email',
 		'company_id',
 	];
+
+	public static function importFromExcel($job) {
+
+		$new_count = $updated_count = $success_count = $error_count = $processed_count = 0;
+
+		//READING EXCEL FILE
+		$objPHPExcel = PHPExcel_IOFactory::load('storage/app/' . $job->src_file);
+		$sheet = $objPHPExcel->getSheet(0);
+		$highestRow = $sheet->getHighestDataRow();
+
+		DB::beginTransaction();
+		// $job->status_id = 7204; //Calculating Total Records
+		// $job->save();
+
+		$header = $sheet->rangeToArray('A1:F1', NULL, TRUE, FALSE);
+		$header = $header[0];
+
+		foreach ($header as $key => $column) {
+			$empty_columns = [];
+			if ($column == NULL) {
+				$empty_columns[] = $key;
+				unset($header[$key]);
+			}
+		}
+		$rows = $sheet->rangeToArray('A2:' . 'F' . $highestRow, NULL, TRUE, FALSE);
+		$total_records = $highestRow - 1;
+		$job->total_record_count = $total_records;
+		$job->remaining_count = $total_records;
+		// $job->status_id = 7201; //Inprogress
+		$job->save();
+
+		$all_error_records = [];
+		$error_msg = $status = $records = '';
+		$sr_no = 0;
+		foreach ($rows as $k => $row) {
+			// DB::beginTransaction();
+			$record = [];
+			foreach ($header as $key => $column) {
+				if (!$column) {
+					continue;
+				} else {
+					$record[$column] = trim($row[$key]);
+				}
+			}
+
+			$original_record = $record;
+
+			$status = [];
+			$status['errors'] = [];
+
+			if (empty($record['date_of_printing'])) {
+				$status['errors'][] = 'Date of printing is empty';
+			} else {
+				$coupon = Coupon::where([
+					'company_id' => $job->id,
+					'code' => $record['coupon_code'],
+				])->first();
+				if ($coupon) {
+					$status['errors'][] = 'Duplicate coupon code';
+				}
+			}
+
+			if (empty($record['date_of_printing'])) {
+				$status['errors'][] = 'Date of printing is empty';
+			}
+
+			if (empty($record['points'])) {
+				$status['errors'][] = 'Point is empty';
+			}
+
+			if (count($status['errors']) > 0) {
+				// dump($status['errors']);
+				$original_record['Record No'] = $k + 1;
+				$original_record['Error Details'] = implode(',', $status['errors']);
+				$all_error_records[] = $original_record;
+				$error_count++;
+				continue;
+			}
+
+			$coupon = Coupon::create([
+				'company_id' => $job->id,
+				'code' => $record['coupon_code'], //ITEM
+				'date' => date('Y-m-d', strtotime($record['date_of_printing'])),
+				'point' => $record['point'],
+				'status_id' => 7400,
+				'created_by_id' => $job->created_by_id,
+			]);
+
+			$newCount++;
+
+			//UPDATING PROGRESS FOR EVERY FIVE RECORDS
+			// if (($k + 1) % 5 == 0) {
+			$job->new_count = $newCount;
+			$job->error_count = $error_count;
+			$job->remaining_count = $total_records - ($k + 1);
+			$job->processed_count = $k + 1;
+			$job->save();
+			// }
+		}
+		if (count($all_error_records) > 0) {
+			$job->error_details = 'Error occured during import. Check the error report';
+		}
+
+		// $job->processed_count = $total_records;
+		// $job->processed_count = 0;
+		$job->new_count = $newCount;
+		$job->updated_count = $updatedcount;
+		$job->error_count = $error_count;
+		$job->status_id = 7202; //COMPLETED
+		$job->save();
+		DB::commit();
+		// dd($all_error_records);
+		if (count($all_error_records) > 0) {
+			Excel::load('storage/app/' . $job->output_file, function ($excel) use ($all_error_records, $job) {
+				$excel->sheet('Error Details', function ($sheet) use ($all_error_records) {
+					// dd($sheet);
+					foreach ($all_error_records as $error_record) {
+						$sheet->appendRow($error_record, null, 'A1', false, false);
+
+						if (isset($error_record['Record No'])) {
+							$sheet->row($sheet->getHighestRow(), function ($row) {
+								//get last row at the moment and style it
+								$row->setFontColor('#FF0000');
+							});
+						}
+					}
+				});
+			})->store('xlsx', storage_path('app/' . $job->output_file));
+		}
+
+	}
 
 	public static function createFromObject($record_data, $company = null) {
 
