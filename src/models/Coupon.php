@@ -117,7 +117,9 @@ class Coupon extends Model {
 
 				$encrypted_qr_code = $coupon->code . ', ' . date('d-m-Y', strtotime($coupon->date));
 				$qr_code = base64_decode(DNS2D::getBarcodePNG($encrypted_qr_code, "QRCODE", 30, 30));
-				$result = Storage::put('public/wad-qr-coupons/' . date('d-m-Y', strtotime($coupon->date) . '/' . $coupon->code . '.png', $qr_code));
+				$qr_destination = 'public/wad-qr-coupons/'; // . date('d-m-Y', strtotime($coupon->date)) . '/';
+				Storage::makeDirectory($qr_destination, 0777);
+				$result = Storage::put($qr_destination . $coupon->code . '.png', $qr_code);
 
 				$new_count++;
 
