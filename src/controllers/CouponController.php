@@ -5,6 +5,7 @@ use Abs\CouponPkg\Coupon;
 use App\Http\Controllers\Controller;
 use Auth;
 use DB;
+use Entrust;
 use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 
@@ -41,6 +42,10 @@ class CouponController extends Controller {
 			})
 			->groupBy('coupons.date')
 			->orderby('coupons.date', 'desc');
+
+		if (!Entrust::can('view-all-coupon')) {
+			$Coupon_list = $Coupon_list->where('coupons.created_by_id', Auth::user()->id);
+		}
 
 		return Datatables::of($Coupon_list)
 			->addColumn('action', function ($Coupon_list) {
