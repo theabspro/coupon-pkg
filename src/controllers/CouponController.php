@@ -92,6 +92,11 @@ class CouponController extends Controller {
 
 				return '<a href="#!/coupon-pkg/coupon/view/' . $Coupon_code_list->date . '/' . $Coupon_code_list->id . '" id = "" ><img src="' . $img2 . '" alt="View" class="img-responsive add" onmouseover=this.src="' . $img2_active . '" onmouseout=this.src="' . $img2 . '"></a>';
 			})
+			->addColumn('qr_image', function ($coupon_code) {
+				$qr_image = asset('storage/app/public/wad-qr-coupons/' . $coupon_code->code . '.png');
+
+				return '<img src="' . $qr_image . '" alt="Coupon QR Image" class="img-responsive" style="width:70px;">';
+			})
 			->make(true);
 	}
 

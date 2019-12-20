@@ -60,6 +60,12 @@
                                                         <span class="info">{{$ctrl.coupon_code.updated_date ? $ctrl.coupon_code.updated_date : '--'}}</span>
                                                     </li>
                                                     <li class="claimed-coupon-list-item">
+                                                        <span class="label">QR</span>
+                                                        <span class="info">
+                                                            <img src="storage/app/public/wad-qr-coupons/{{$ctrl.coupon_code.code}}.png" alt="Coupon QR Image" class="img-responsive" style="width:70px;">
+                                                        </span>
+                                                    </li>
+                                                    <li class="claimed-coupon-list-item">
                                                         <span class="label">Status</span>
                                                         <span class="info">{{$ctrl.coupon_code.status}}</span>
                                                     </li>
