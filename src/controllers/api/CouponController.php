@@ -97,7 +97,7 @@ class CouponController extends Controller {
 			if (!$coupon) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Coupon ID redeem already',
+					'error' => 'Coupon already redeemed',
 				], $this->successStatus);
 			}
 
