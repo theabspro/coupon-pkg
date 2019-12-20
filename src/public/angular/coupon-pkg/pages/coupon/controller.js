@@ -145,7 +145,8 @@ app.component('couponCodesView', {
             },
             columns: [
                 { data: 'action', class: 'action', searchable: false },
-                { data: 'code', name: 'coupons.code', class: 'text-right' },
+                { data: 'qr_image', searchable: false },
+                { data: 'code', name: 'coupons.code', class: 'text-left' },
                 { data: 'point', name: 'coupons.point', class: 'text-right' },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {
