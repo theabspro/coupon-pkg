@@ -193,7 +193,7 @@ class CouponController extends Controller {
 					->where('coupons.status_id', 7401)
 					->first();
 				if (!$coupon_id_check) {
-					$errors[] = "Coupon ID: " . $coupon . " doesn't scanned";
+					$errors[] = "Coupon ID: " . $coupon . " already scanned";
 				} else {
 					$total_points[] = $coupon_id_check->point;
 				}
@@ -245,13 +245,15 @@ class CouponController extends Controller {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$message_id = curl_exec($ch);
 		curl_close($ch);
+		$sms_insert = '';
 		if (!empty($message_id)) {
 			$sms_insert = DB::table('mpay_sent_sms_details')->insert(
 				['customer_id' => $customer_id, 'employee_id' => $employee_id, 'sender_id' => $sms_sender_id, 'message' => $message, 'message_id' => $message_id, 'mobile_number' => $mobile_number, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
 			);
+			if ($sms_insert) {
+				return true;
+			}
 		}
-		if ($sms_insert) {
-			return true;
-		}
+
 	}
 }
