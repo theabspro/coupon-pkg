@@ -39,27 +39,37 @@ class CouponController extends Controller {
 			], $this->successStatus);
 		}
 
-		// $coupon_code_values = explode(", ", $coupon_code);
-		// $date = $coupon_code_values[1];
-		$coupon_code_date = date("Y-m-d", strtotime($request->date));
-		$coupon = Coupon::where([
+		$coupon_code_date = date('Y-m-d', strtotime($request->date));
+		$coupon_validation = Coupon::where([
 			'code' => $request->coupon_code,
 			'date' => $coupon_code_date,
 			'company_id' => $user_validation->company_id,
-			'status_id' => 7400,
 		])
 			->first();
-
-		if (!$coupon) {
+		if (!$coupon_validation) {
 			return response()->json([
 				'success' => false,
-				'error' => 'Coupon Already Redeemed',
+				'error' => 'Coupon not found',
 			], $this->successStatus);
+		} else {
+			$coupon = Coupon::where([
+				'code' => $request->coupon_code,
+				'date' => $coupon_code_date,
+				'company_id' => $user_validation->company_id,
+				'status_id' => 7400])
+				->first();
+			if (!$coupon) {
+				return response()->json([
+					'success' => false,
+					'error' => 'Coupon Already Redeemed',
+				], $this->successStatus);
+			} else {
+				return response()->json([
+					'success' => true,
+					'coupon' => $coupon,
+				]);
+			}
 		}
-		return response()->json([
-			'success' => true,
-			'coupon' => $coupon,
-		]);
 	}
 
 	public function redeemCoupon(Request $request) {
