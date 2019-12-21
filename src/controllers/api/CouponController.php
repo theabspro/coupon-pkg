@@ -18,9 +18,24 @@ class CouponController extends Controller {
 	}
 
 	public function getCoupon(Request $request) {
+
+		if (!empty($request->date)) {
+			$coupon_code_validate = 'required|string';
+			$date_validate = 'required|date';
+			$coupon_code = $request->coupon_code;
+			$coupon_code_date = date('Y-m-d', strtotime($request->date));
+		} else {
+			$coupon_code_validate = 'required|string';
+			$date_validate = 'nullable';
+			$coupon_code_values = explode(", ", $request->coupon_code);
+			$coupon_code = $coupon_code_values[0];
+			$coupon_code_date = date('Y-m-d', strtotime($coupon_code_values[1]));
+		}
+
 		$validator = Validator::make($request->all(), [
 			'user_id' => 'required|numeric',
-			'coupon_code' => 'required|string',
+			'coupon_code' => $coupon_code_validate,
+			'date' => $date_validate,
 		]);
 		if ($validator->fails()) {
 			return response()->json([
@@ -34,25 +49,41 @@ class CouponController extends Controller {
 		if (!$user_validation) {
 			return response()->json([
 				'success' => false,
-				'error' => 'User ID not found',
+				'error' => 'User not found',
 			], $this->successStatus);
 		}
 
-		$coupon_code = $request->coupon_code;
-		$coupon_code_values = explode(", ", $coupon_code);
-		$date = $coupon_code_values[1];
-		$coupon_code_date = date("Y-m-d", strtotime($date));
-		$coupon = Coupon::where('code', $coupon_code_values[0])->where('date', $coupon_code_date)->first();
-		if (!$coupon) {
+		$coupon_validation = Coupon::where([
+			'code' => $coupon_code,
+			'date' => $coupon_code_date,
+			'company_id' => $user_validation->company_id,
+		])
+			->first();
+		if (!$coupon_validation) {
 			return response()->json([
 				'success' => false,
-				'error' => 'Coupon Code not valid',
+				'error' => 'Coupon not found',
 			], $this->successStatus);
+		} else {
+			$coupon = Coupon::where([
+				'code' => $coupon_code,
+				'date' => $coupon_code_date,
+				'company_id' => $user_validation->company_id,
+				'status_id' => 7400])
+				->first();
+			if (!$coupon) {
+				return response()->json([
+					'success' => false,
+					'error' => 'Coupon Already Redeemed',
+				], $this->successStatus);
+			} else {
+				return response()->json([
+					'success' => true,
+					'coupon' => $coupon,
+					'message' => 'Kindly Contact 09876541230 to get Printed Date and enter below',
+				]);
+			}
 		}
-		return response()->json([
-			'success' => true,
-			'coupon' => $coupon,
-		]);
 	}
 
 	public function redeemCoupon(Request $request) {
@@ -81,7 +112,7 @@ class CouponController extends Controller {
 			if (!$user_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'User ID not found',
+					'error' => 'User not found',
 				], $this->successStatus);
 			}
 
@@ -89,7 +120,7 @@ class CouponController extends Controller {
 			if (!$customer_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Customer ID not found',
+					'error' => 'Customer not found',
 				], $this->successStatus);
 			}
 
@@ -97,7 +128,7 @@ class CouponController extends Controller {
 			if (!$coupon) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Coupon already redeemed',
+					'error' => 'Coupon not found',
 				], $this->successStatus);
 			}
 
@@ -105,7 +136,7 @@ class CouponController extends Controller {
 			if (!$item_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Item ID not found',
+					'error' => 'Item not found',
 				], $this->successStatus);
 			}
 			$customer_user_id = MpayCustomerDetail::select('mpay_customer_details.*', 'users.id as customer_user_id')
@@ -193,7 +224,7 @@ class CouponController extends Controller {
 					->where('coupons.status_id', 7401)
 					->first();
 				if (!$coupon_id_check) {
-					$errors[] = "Coupon ID: " . $coupon . " doesn't scanned";
+					$errors[] = "Coupon ID: " . $coupon . " already scanned";
 				} else {
 					$total_points[] = $coupon_id_check->point;
 				}
@@ -245,13 +276,15 @@ class CouponController extends Controller {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$message_id = curl_exec($ch);
 		curl_close($ch);
+		$sms_insert = '';
 		if (!empty($message_id)) {
 			$sms_insert = DB::table('mpay_sent_sms_details')->insert(
 				['customer_id' => $customer_id, 'employee_id' => $employee_id, 'sender_id' => $sms_sender_id, 'message' => $message, 'message_id' => $message_id, 'mobile_number' => $mobile_number, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
 			);
+			if ($sms_insert) {
+				return true;
+			}
 		}
-		if ($sms_insert) {
-			return true;
-		}
+
 	}
 }
