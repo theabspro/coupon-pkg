@@ -21,6 +21,7 @@ class CouponController extends Controller {
 		$validator = Validator::make($request->all(), [
 			'user_id' => 'required|numeric',
 			'coupon_code' => 'required|string',
+			'date' => 'date',
 		]);
 		if ($validator->fails()) {
 			return response()->json([
@@ -34,19 +35,25 @@ class CouponController extends Controller {
 		if (!$user_validation) {
 			return response()->json([
 				'success' => false,
-				'error' => 'User ID not found',
+				'error' => 'User not found',
 			], $this->successStatus);
 		}
 
-		$coupon_code = $request->coupon_code;
-		$coupon_code_values = explode(", ", $coupon_code);
-		$date = $coupon_code_values[1];
-		$coupon_code_date = date("Y-m-d", strtotime($date));
-		$coupon = Coupon::where('code', $coupon_code_values[0])->where('date', $coupon_code_date)->first();
+		// $coupon_code_values = explode(", ", $coupon_code);
+		// $date = $coupon_code_values[1];
+		$coupon_code_date = date("Y-m-d", strtotime($request->date));
+		$coupon = Coupon::where([
+			'code' => $request->coupon_code,
+			'date' => $coupon_code_date,
+			'company_id' => $user_validation->company_id,
+			'status_id' => 7400,
+		])
+			->first();
+
 		if (!$coupon) {
 			return response()->json([
 				'success' => false,
-				'error' => 'Coupon Code not valid',
+				'error' => 'Coupon Already Redeemed',
 			], $this->successStatus);
 		}
 		return response()->json([
@@ -81,7 +88,7 @@ class CouponController extends Controller {
 			if (!$user_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'User ID not found',
+					'error' => 'User not found',
 				], $this->successStatus);
 			}
 
@@ -89,7 +96,7 @@ class CouponController extends Controller {
 			if (!$customer_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Customer ID not found',
+					'error' => 'Customer not found',
 				], $this->successStatus);
 			}
 
@@ -97,7 +104,7 @@ class CouponController extends Controller {
 			if (!$coupon) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Coupon already redeemed',
+					'error' => 'Coupon not found',
 				], $this->successStatus);
 			}
 
@@ -105,7 +112,7 @@ class CouponController extends Controller {
 			if (!$item_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Item ID not found',
+					'error' => 'Item not found',
 				], $this->successStatus);
 			}
 			$customer_user_id = MpayCustomerDetail::select('mpay_customer_details.*', 'users.id as customer_user_id')
