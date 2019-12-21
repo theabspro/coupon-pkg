@@ -62,7 +62,6 @@ class Coupon extends Model {
 			$error_msg = $status = $records = '';
 			$sr_no = 0;
 			foreach ($rows as $k => $row) {
-				DB::beginTransaction();
 				$record = [];
 				foreach ($header as $key => $column) {
 					if (!$column) {
@@ -106,6 +105,7 @@ class Coupon extends Model {
 					continue;
 				}
 
+				DB::beginTransaction();
 				$coupon = Coupon::create([
 					'company_id' => $job->company_id,
 					'code' => $record['Code'], //ITEM
@@ -123,25 +123,28 @@ class Coupon extends Model {
 
 				$new_count++;
 
+				DB::commit();
 				//UPDATING PROGRESS FOR EVERY FIVE RECORDS
 				if (($k + 1) % 5 == 0) {
 					$job->new_count = $new_count;
 					$job->error_count = $error_count;
 					$job->remaining_count = $total_records - ($k + 1);
+					$job->updated_count = $updated_count;
 					$job->processed_count = $k + 1;
 					$job->save();
 				}
-				DB::commit();
 			}
 			if (count($all_error_records) > 0) {
 				$job->error_details = 'Error occured during import. Check the error report';
 			}
 
-			$job->processed_count = $total_records;
 			$job->new_count = $new_count;
-			$job->updated_count = $updated_count;
 			$job->error_count = $error_count;
-			$job->status_id = 7202; //COMPLETED
+			$job->remaining_count = $total_records - ($k + 1);
+			$job->updated_count = $updated_count;
+			$job->processed_count = $total_records;
+			//COMPLETED or completed with errors
+			$job->status_id = $error_count == 0 ? 7202 : 7205;
 			$job->save();
 			if (count($all_error_records) > 0) {
 				Excel::load('storage/app/' . $job->output_file, function ($excel) use ($all_error_records, $job) {
@@ -160,9 +163,8 @@ class Coupon extends Model {
 					});
 				})->store('xlsx', storage_path('app/' . $job->type->folder_path));
 			}
-			dump($all_error_records, 'Success. Total Record : ' . $new_count);
+			dump('Success. Total Record : ' . $new_count);
 		} catch (\Throwable $e) {
-			DB::rollback();
 			$job->status_id = 7203; //Error
 			$job->error_details = 'Error:' . $e->getMessage() . '. Line:' . $e->getLine() . '. File:' . $e->getFile(); //Error
 			$job->save();
