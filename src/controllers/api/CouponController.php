@@ -236,14 +236,14 @@ class CouponController extends Controller {
 				], $this->successStatus);
 			}
 			if ($coupon_id_check) {
-				$mobile_number = $coupon_id_check->mobile_number;
+				$mobile_number = config('custom.TEST_SMS') ? config('custom.TEST_MOBILE') : $coupon_id_check->mobile_number;
 
 				$message = config('custom.SMS_TEMPLATES.COUPON_ALERT');
 				$args = ['total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
 				$message = vsprintf($message, $args);
 
 				if (!empty($mobile_number) && $mobile_number != 7777777777) {
-					$res = $this->sendsms($coupon_id_check->mobile_number, $message, $coupon_id_check->customer_id, $coupon_id_check->employee_id);
+					$res = $this->sendsms($mobile_number, $message, $coupon_id_check->customer_id, $coupon_id_check->employee_id);
 				}
 				return response()->json([
 					'success' => true,
