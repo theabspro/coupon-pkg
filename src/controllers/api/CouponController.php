@@ -80,6 +80,7 @@ class CouponController extends Controller {
 				return response()->json([
 					'success' => true,
 					'coupon' => $coupon,
+					'message' => 'Kindly Contact 09876541230 to get Printed Date and enter below',
 				]);
 			}
 		}
