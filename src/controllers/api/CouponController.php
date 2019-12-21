@@ -18,10 +18,24 @@ class CouponController extends Controller {
 	}
 
 	public function getCoupon(Request $request) {
+
+		if (!empty($request->date)) {
+			$coupon_code_validate = 'required|string';
+			$date_validate = 'required|date';
+			$coupon_code = $request->coupon_code;
+			$coupon_code_date = date('Y-m-d', strtotime($request->date));
+		} else {
+			$coupon_code_validate = 'required|string';
+			$date_validate = 'nullable';
+			$coupon_code_values = explode(", ", $request->coupon_code);
+			$coupon_code = $coupon_code_values[0];
+			$coupon_code_date = date('Y-m-d', strtotime($coupon_code_values[1]));
+		}
+
 		$validator = Validator::make($request->all(), [
 			'user_id' => 'required|numeric',
-			'coupon_code' => 'required|string',
-			'date' => 'date',
+			'coupon_code' => $coupon_code_validate,
+			'date' => $date_validate,
 		]);
 		if ($validator->fails()) {
 			return response()->json([
@@ -39,9 +53,8 @@ class CouponController extends Controller {
 			], $this->successStatus);
 		}
 
-		$coupon_code_date = date('Y-m-d', strtotime($request->date));
 		$coupon_validation = Coupon::where([
-			'code' => $request->coupon_code,
+			'code' => $coupon_code,
 			'date' => $coupon_code_date,
 			'company_id' => $user_validation->company_id,
 		])
@@ -53,7 +66,7 @@ class CouponController extends Controller {
 			], $this->successStatus);
 		} else {
 			$coupon = Coupon::where([
-				'code' => $request->coupon_code,
+				'code' => $coupon_code,
 				'date' => $coupon_code_date,
 				'company_id' => $user_validation->company_id,
 				'status_id' => 7400])
