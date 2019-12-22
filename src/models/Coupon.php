@@ -7,11 +7,9 @@ use App\Company;
 use App\Config;
 use DB;
 use DNS2D;
-use Excel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
-use PHPExcel_IOFactory;
 use PHPExcel_Shared_Date;
 
 class Coupon extends Model {
@@ -30,37 +28,11 @@ class Coupon extends Model {
 	public static function importFromExcel($job) {
 
 		try {
-
-			$new_count = $updated_count = $success_count = $error_count = $processed_count = 0;
-
-			//READING EXCEL FILE
-			$objPHPExcel = PHPExcel_IOFactory::load('storage/app/' . $job->src_file);
-			$sheet = $objPHPExcel->getSheet(0);
-			$highestRow = $sheet->getHighestDataRow();
-
-			// $job->status_id = 7204; //Calculating Total Records
-			// $job->save();
-
-			$header = $sheet->rangeToArray('A1:F1', NULL, TRUE, FALSE);
-			$header = $header[0];
-
-			foreach ($header as $key => $column) {
-				$empty_columns = [];
-				if ($column == NULL) {
-					$empty_columns[] = $key;
-					unset($header[$key]);
-				}
-			}
-			$rows = $sheet->rangeToArray('A2:' . 'F' . $highestRow, NULL, TRUE, FALSE);
-			$total_records = $highestRow - 1;
-			$job->total_record_count = $total_records;
-			$job->remaining_count = $total_records;
-			$job->status_id = 7201; //Inprogress
-			$job->save();
+			$response = ImportJobCronController::getRecordsFromExcel($job, 'F');
+			$rows = $response['rows'];
+			$header = $response['header'];
 
 			$all_error_records = [];
-			$error_msg = $status = $records = '';
-			$sr_no = 0;
 			foreach ($rows as $k => $row) {
 				$record = [];
 				foreach ($header as $key => $column) {
@@ -101,7 +73,7 @@ class Coupon extends Model {
 					$original_record['Record No'] = $k + 1;
 					$original_record['Error Details'] = implode(',', $status['errors']);
 					$all_error_records[] = $original_record;
-					$error_count++;
+					$job->incrementError();
 					continue;
 				}
 
@@ -121,49 +93,24 @@ class Coupon extends Model {
 				Storage::makeDirectory($qr_destination, 0777);
 				$result = Storage::put($qr_destination . $coupon->code . '.png', $qr_code);
 
-				$new_count++;
+				$job->incrementNew();
 
 				DB::commit();
 				//UPDATING PROGRESS FOR EVERY FIVE RECORDS
 				if (($k + 1) % 5 == 0) {
-					$job->new_count = $new_count;
-					$job->error_count = $error_count;
-					$job->remaining_count = $total_records - ($k + 1);
-					$job->updated_count = $updated_count;
-					$job->processed_count = $k + 1;
 					$job->save();
 				}
 			}
-			if (count($all_error_records) > 0) {
-				$job->error_details = 'Error occured during import. Check the error report';
-			}
 
-			$job->new_count = $new_count;
-			$job->error_count = $error_count;
-			$job->remaining_count = $total_records - ($k + 1);
-			$job->updated_count = $updated_count;
-			$job->processed_count = $total_records;
 			//COMPLETED or completed with errors
-			$job->status_id = $error_count == 0 ? 7202 : 7205;
+			$job->status_id = $job->error_count == 0 ? 7202 : 7205;
 			$job->save();
-			if (count($all_error_records) > 0) {
-				Excel::load('storage/app/' . $job->output_file, function ($excel) use ($all_error_records, $job) {
-					$excel->sheet('Error Details', function ($sheet) use ($all_error_records) {
-						// dd($sheet);
-						foreach ($all_error_records as $error_record) {
-							$sheet->appendRow($error_record, null, 'A1', false, false);
 
-							if (isset($error_record['Record No'])) {
-								$sheet->row($sheet->getHighestRow(), function ($row) {
-									//get last row at the moment and style it
-									$row->setFontColor('#FF0000');
-								});
-							}
-						}
-					});
-				})->store('xlsx', storage_path('app/' . $job->type->folder_path));
-			}
-			dump('Success. Total Record : ' . $new_count);
+			ImportJobCronController::generateImportReport([
+				'job' => $job,
+				'all_error_records' => $all_error_records,
+			]);
+
 		} catch (\Throwable $e) {
 			$job->status_id = 7203; //Error
 			$job->error_details = 'Error:' . $e->getMessage() . '. Line:' . $e->getLine() . '. File:' . $e->getFile(); //Error
