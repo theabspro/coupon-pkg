@@ -182,6 +182,8 @@ app.component('couponView', {
     controller: function($http, $location, HelperService, $scope, $routeParams, $rootScope) {
         var self = this;
         self.hasPermission = HelperService.hasPermission;
+        self.claimed_permission = self.hasPermission('claimed-coupons');
+        self.payment_permission = self.hasPermission('payments');
         self.angular_routes = angular_routes;
         $http.get(
             coupon_code_view_url + '/' + $routeParams.date + '/' + $routeParams.id

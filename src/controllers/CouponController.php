@@ -83,7 +83,7 @@ class CouponController extends Controller {
 		)
 			->where('coupons.company_id', Auth::user()->company_id)
 			->where('coupons.date', $date)
-			->orderby('coupons.id', 'desc');
+			->orderby('coupons.id', 'asc');
 		// dd($Coupon_code_list);
 		return Datatables::of($Coupon_code_list)
 			->addColumn('action', function ($Coupon_code_list) {

@@ -72,15 +72,34 @@ class CouponController extends Controller {
 				'status_id' => 7400])
 				->first();
 			if (!$coupon) {
+				$redeemed_coupon = Coupon::select(
+					DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as print_date'),
+					'emp.employee_name',
+					'emp.employee_code',
+					'cust.customer_name',
+					'cust.customer_code',
+
+				)
+					->join('users', 'users.id', 'coupons.claim_initiated_by_id')
+					->join('mpay_employee_details as emp', 'emp.id', 'users.entity_id')
+					->join('users as customer', 'customer.id', 'coupons.claimed_to_id')
+					->join('mpay_customer_details as cust', 'cust.id', 'customer.entity_id')
+					->where([
+						'coupons.code' => $coupon_code,
+						'coupons.date' => $coupon_code_date,
+						'coupons.company_id' => $user_validation->company_id,
+						'coupons.status_id' => 7401])
+					->first();
 				return response()->json([
 					'success' => false,
 					'error' => 'Coupon Already Redeemed',
+					'redeemed_details' => $redeemed_coupon,
 				], $this->successStatus);
 			} else {
 				return response()->json([
 					'success' => true,
 					'coupon' => $coupon,
-					'message' => 'Kindly Contact 09876541230 to get Printed Date and enter below',
+					'message' => "Kindly Contact '8925297806' to get Printed Date and Enter",
 				]);
 			}
 		}
@@ -188,7 +207,7 @@ class CouponController extends Controller {
 			if (!$user_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'User ID not found',
+					'error' => 'User not found',
 				], $this->successStatus);
 			}
 
@@ -202,7 +221,7 @@ class CouponController extends Controller {
 			if (!$customer_validation) {
 				return response()->json([
 					'success' => false,
-					'error' => 'Customer ID not found',
+					'error' => 'Customer not found',
 				], $this->successStatus);
 			}
 
@@ -235,6 +254,7 @@ class CouponController extends Controller {
 					'error' => $errors,
 				], $this->successStatus);
 			}
+
 			if ($coupon_id_check) {
 				$mobile_number = config('custom.TEST_SMS') ? config('custom.TEST_MOBILE') : $coupon_id_check->mobile_number;
 
@@ -247,7 +267,7 @@ class CouponController extends Controller {
 				}
 				return response()->json([
 					'success' => true,
-					'message' => 'Coupon Redeemed Successfully',
+					'message' => count($request->coupon_id) . ' Coupons Redeemed Successfully',
 					// 'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption added to your account by ' . $coupon_id_check->employee_name,
 				], $this->successStatus);
 			}

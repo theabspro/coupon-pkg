@@ -3,6 +3,7 @@
 namespace Abs\CouponPkg;
 
 use Abs\HelperPkg\Traits\SeederTrait;
+use Abs\ImportCronJobPkg\ImportCronJob;
 use App\Company;
 use App\Config;
 use DB;
@@ -21,14 +22,14 @@ class Coupon extends Model {
 		'code',
 		'date',
 		'point',
+		'pack_size',
 		'status_id',
 		'created_by_id',
 	];
 
 	public static function importFromExcel($job) {
-
 		try {
-			$response = ImportJobCronController::getRecordsFromExcel($job, 'F');
+			$response = ImportCronJob::getRecordsFromExcel($job, 'G');
 			$rows = $response['rows'];
 			$header = $response['header'];
 
@@ -44,7 +45,6 @@ class Coupon extends Model {
 				}
 
 				$original_record = $record;
-
 				$status = [];
 				$status['errors'] = [];
 
@@ -68,6 +68,9 @@ class Coupon extends Model {
 					$status['errors'][] = 'Point is empty';
 				}
 
+				if (empty($record['Pack Size'])) {
+					$status['errors'][] = 'Pack Size is empty';
+				}
 				if (count($status['errors']) > 0) {
 					// dump($status['errors']);
 					$original_record['Record No'] = $k + 1;
@@ -83,8 +86,10 @@ class Coupon extends Model {
 					'code' => $record['Code'], //ITEM
 					'date' => date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($record['Date of Printing'])),
 					'point' => $record['Point'],
+					'pack_size' => $record['Pack Size'],
 					'status_id' => 7400,
 					'created_by_id' => $job->created_by_id,
+					'updated_at' => NULL,
 				]);
 
 				$encrypted_qr_code = $coupon->code . ', ' . date('d-m-Y', strtotime($coupon->date));
@@ -106,7 +111,7 @@ class Coupon extends Model {
 			$job->status_id = $job->error_count == 0 ? 7202 : 7205;
 			$job->save();
 
-			ImportJobCronController::generateImportReport([
+			ImportCronJob::generateImportReport([
 				'job' => $job,
 				'all_error_records' => $all_error_records,
 			]);

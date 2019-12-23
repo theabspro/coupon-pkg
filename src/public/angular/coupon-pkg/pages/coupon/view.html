@@ -30,8 +30,8 @@
                                     <div class="isotope-filters animated" data-animation="fadeInLeft" data-animation-delay="300">
                                         <ul class="nav nav-pills editDetails-tabs">
                                             <li class="active"><a data-target="#general-info" role="tab" data-toggle="tab" aria-expanded="true">Coupon Details</a></li>
-                                            <li><a data-target="#claim-details" data-toggle="tab" role="tab" aria-expanded="true">Claim Details</a></li>
-                                            <li><a data-target="#payment-details" data-toggle="tab" role="tab" aria-expanded="true">Payment Details</a></li>
+                                            <li ng-if="$ctrl.claimed_permission"><a data-target="#claim-details" data-toggle="tab" role="tab" aria-expanded="true">Claim Details</a></li>
+                                            <li ng-if="$ctrl.payment_permission"><a data-target="#payment-details" data-toggle="tab" role="tab" aria-expanded="true">Payment Details</a></li>
                                         </ul>
                                     </div><!-- Filters -->
                                 </div><!-- Tab Header -->
