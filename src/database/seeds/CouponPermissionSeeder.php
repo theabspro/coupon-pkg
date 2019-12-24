@@ -31,6 +31,18 @@ class CouponPermissionSeeder extends Seeder {
 				'name' => 'view-all-coupon',
 				'display_name' => 'View All',
 			],
+			10003 => [
+				'display_order' => 3,
+				'parent_id' => 10000,
+				'name' => 'view-claim-details',
+				'display_name' => 'View Claim Details',
+			],
+			10004 => [
+				'display_order' => 4,
+				'parent_id' => 10000,
+				'name' => 'view-payment-details',
+				'display_name' => 'View Payment Details',
+			],
 
 			10020 => [
 				'display_order' => 2,
