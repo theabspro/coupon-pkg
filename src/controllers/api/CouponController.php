@@ -259,7 +259,7 @@ class CouponController extends Controller {
 				$mobile_number = config('custom.TEST_SMS') ? config('custom.TEST_MOBILE') : $coupon_id_check->mobile_number;
 
 				$message = config('custom.SMS_TEMPLATES.COUPON_ALERT');
-				$args = ['total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
+				$args = ['total_coupons' => count($request->coupon_id), 'total_points' => array_sum($total_points), 'employee_name' => $coupon_id_check->employee_name];
 				$message = vsprintf($message, $args);
 
 				if (!empty($mobile_number) && $mobile_number != 7777777777) {
