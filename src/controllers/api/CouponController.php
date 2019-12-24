@@ -73,7 +73,7 @@ class CouponController extends Controller {
 				->first();
 			if (!$coupon) {
 				$redeemed_coupon = Coupon::select(
-					DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as print_date'),
+					DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as claimed_date'),
 					'emp.employee_name',
 					'emp.employee_code',
 					'cust.customer_name',
