@@ -20,11 +20,13 @@ class CouponController extends Controller {
 			'coupons.date',
 			DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
 			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date'),
-			DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
+			DB::raw('IF((suppliers.name) IS NULL,"--",suppliers.name) as uploaded_by'),
+			// DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
 			DB::raw('COUNT(coupons.id) as coupons_count')
 		)
+		//->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
 			->leftJoin('users', 'users.id', 'coupons.created_by_id')
-			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
+			->leftJoin('suppliers', 'suppliers.id', 'users.entity_id')
 			->where('coupons.company_id', Auth::user()->company_id)
 			->where(function ($query) use ($request) {
 				if (!empty($request->print_start_date) && !empty($request->print_end_date)) {
@@ -44,7 +46,8 @@ class CouponController extends Controller {
 			->orderby('coupons.date', 'desc');
 
 		if (!Entrust::can('view-all-coupon')) {
-			$Coupon_list = $Coupon_list->where('coupons.created_by_id', Auth::user()->id);
+			$Coupon_list = $Coupon_list->where('coupons.created_by_id', Auth::user()->id)
+				->where('users.user_type_id', 8);
 		}
 
 		return Datatables::of($Coupon_list)
@@ -62,11 +65,13 @@ class CouponController extends Controller {
 			'coupons.id',
 			DB::raw('DATE_FORMAT(coupons.date, "%d/%m/%Y") as printed_date'),
 			DB::raw('DATE_FORMAT(coupons.created_at, "%d/%m/%Y") as uploaded_date'),
-			DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
+			DB::raw('IF((suppliers.name) IS NULL,"--",suppliers.name) as uploaded_by'),
+			// DB::raw('IF((mpay_employee_details.employee_name) IS NULL,"--",mpay_employee_details.employee_name) as uploaded_by'),
 			DB::raw('COUNT(coupons.id) as coupons_count')
 		)
 			->leftJoin('users', 'users.id', 'coupons.created_by_id')
-			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
+		// ->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
+			->leftJoin('suppliers', 'suppliers.id', 'users.entity_id')
 			->where('coupons.company_id', Auth::user()->company_id)
 			->where('coupons.date', $date)
 			->first();
