@@ -264,11 +264,17 @@ class CouponController extends Controller {
 				if (!empty($mobile_number) && $mobile_number != 7777777777) {
 					$res = $this->sendsms($mobile_number, $message, $coupon_id_check->customer_id, $coupon_id_check->employee_id);
 				}
-				return response()->json([
-					'success' => true,
-					'message' => count($request->coupon_id) . ' Coupons Redeemed Successfully',
-					// 'message' => 'Thank you for using TVS Products ' . array_sum($total_points) . ' points redemption added to your account by ' . $coupon_id_check->employee_name,
-				], $this->successStatus);
+				if (count($request->coupon_id) > 1) {
+					return response()->json([
+						'success' => true,
+						'message' => count($request->coupon_id) . ' Coupons Redeemed Successfully',
+					], $this->successStatus);
+				} else {
+					return response()->json([
+						'success' => true,
+						'message' => count($request->coupon_id) . ' Coupon Redeemed Successfully',
+					], $this->successStatus);
+				}
 			}
 		} catch (Exception $e) {
 			return response()->json([
