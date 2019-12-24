@@ -77,8 +77,7 @@ class CouponController extends Controller {
 					'emp.employee_name',
 					'emp.employee_code',
 					'cust.customer_name',
-					'cust.customer_code',
-
+					'cust.customer_code'
 				)
 					->join('users', 'users.id', 'coupons.claim_initiated_by_id')
 					->join('mpay_employee_details as emp', 'emp.id', 'users.entity_id')
@@ -88,7 +87,8 @@ class CouponController extends Controller {
 						'coupons.code' => $coupon_code,
 						'coupons.date' => $coupon_code_date,
 						'coupons.company_id' => $user_validation->company_id,
-						'coupons.status_id' => 7401])
+						'coupons.status_id' => 7401,
+					])
 					->first();
 				return response()->json([
 					'success' => false,
