@@ -84,7 +84,8 @@ class CouponController extends Controller {
 			'coupons.id',
 			'coupons.code',
 			'coupons.date',
-			'coupons.point'
+			'coupons.point',
+			'coupons.pack_size'
 		)
 			->where('coupons.company_id', Auth::user()->company_id)
 			->where('coupons.date', $date)
@@ -112,6 +113,7 @@ class CouponController extends Controller {
 			DB::raw('DATE_FORMAT(coupons.date,"%d/%m/%Y") as date'),
 			DB::raw('DATE_FORMAT(coupons.updated_at,"%d/%m/%Y") as updated_date'),
 			DB::raw('DATE_FORMAT(coupons.claimed_date,"%d/%m/%Y") as climed_date'),
+			'coupons.pack_size',
 			'configs.name as status',
 			'mpay_employee_details.employee_name as clime_initiated_by',
 			'mpay_employee_details.employee_code as clime_initiated_by_code',
