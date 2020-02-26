@@ -22,7 +22,7 @@ class Coupon extends Model {
 		'code',
 		'date',
 		'point',
-		'pack_size',
+		// 'pack_size',
 		'status_id',
 		'created_by_id',
 	];
@@ -79,6 +79,7 @@ class Coupon extends Model {
 					$job->incrementError();
 					continue;
 				}
+				$pack_sizes = explode(',', $record['Pack Size']);
 
 				DB::beginTransaction();
 				$coupon = Coupon::create([
@@ -86,11 +87,19 @@ class Coupon extends Model {
 					'code' => $record['Code'], //ITEM
 					'date' => date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($record['Date of Printing'])),
 					'point' => $record['Point'],
-					'pack_size' => $record['Pack Size'],
+					// 'pack_size' => $record['Pack Size'],
 					'status_id' => 7400,
 					'created_by_id' => $job->created_by_id,
 					'updated_at' => NULL,
 				]);
+				if (!empty($record['Pack Size'])) {
+					foreach ($pack_sizes as $pack_size) {
+						$coupon_pack_size_insert = DB::table('coupon_pack_sizes')->insert([
+							'coupon_id' => $coupon->id,
+							'pack_size' => $pack_size,
+						]);
+					}
+				}
 
 				$encrypted_qr_code = $coupon->code . ', ' . date('d-m-Y', strtotime($coupon->date));
 				$qr_code = base64_decode(DNS2D::getBarcodePNG($encrypted_qr_code, "QRCODE", 30, 30));
