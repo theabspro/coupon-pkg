@@ -11,9 +11,9 @@ class AlterCouponsRemovePackSize extends Migration {
 	 * @return void
 	 */
 	public function up() {
-		Schema::table('coupons', function (Blueprint $table) {
-			$table->dropColumn('pack_size');
-		});
+		// Schema::table('coupons', function (Blueprint $table) {
+		// 	$table->dropColumn('pack_size');
+		// });
 
 		if (!Schema::hasTable('coupon_pack_sizes')) {
 			Schema::create('coupon_pack_sizes', function (Blueprint $table) {
@@ -30,9 +30,9 @@ class AlterCouponsRemovePackSize extends Migration {
 	 * @return void
 	 */
 	public function down() {
-		Schema::table('coupons', function (Blueprint $table) {
-			$table->unsignedDecimal('pack_size', 8, 2)->nullable()->after('point');
-		});
+		// Schema::table('coupons', function (Blueprint $table) {
+		// 	$table->unsignedDecimal('pack_size', 8, 2)->nullable()->after('point');
+		// });
 		Schema::dropIfExists('coupon_pack_sizes');
 	}
 }
