@@ -20,6 +20,7 @@ class AlterCouponsRemovePackSize extends Migration {
 				$table->unsignedInteger('coupon_id');
 				$table->unsignedDecimal('pack_size', 8, 2)->nullable();
 				$table->foreign('coupon_id')->references('id')->on('coupons')->onDelete('CASCADE')->onUpdate('cascade');
+				$table->unique(['coupon_id', 'pack_size']);
 			});
 		}
 	}

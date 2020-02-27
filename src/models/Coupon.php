@@ -68,9 +68,17 @@ class Coupon extends Model {
 					$status['errors'][] = 'Point is empty';
 				}
 
+				$pack_sizes = explode(',', $record['Pack Size']);
 				if (empty($record['Pack Size'])) {
 					$status['errors'][] = 'Pack Size is empty';
+				} else {
+					$pack_size_count = count($pack_sizes);
+					$unique_pack_size_count = count(array_unique($pack_sizes));
+					if ($pack_size_count != $unique_pack_size_count) {
+						$status['errors'][] = 'Pack Sizes Should be Unique ' . $record['Pack Size'];
+					}
 				}
+
 				if (count($status['errors']) > 0) {
 					// dump($status['errors']);
 					$original_record['Record No'] = $k + 1;
@@ -79,7 +87,6 @@ class Coupon extends Model {
 					$job->incrementError();
 					continue;
 				}
-				$pack_sizes = explode(',', $record['Pack Size']);
 
 				DB::beginTransaction();
 				$coupon = Coupon::create([
