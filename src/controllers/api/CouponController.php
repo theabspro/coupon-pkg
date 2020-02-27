@@ -53,11 +53,17 @@ class CouponController extends Controller {
 			], $this->successStatus);
 		}
 
-		$coupon_validation = Coupon::where([
-			'code' => $coupon_code,
-			'date' => $coupon_code_date,
-			'company_id' => $user_validation->company_id,
-		])
+		$coupon_validation = Coupon::select(
+			'coupons.*',
+			DB::raw('group_concat(coupon_pack_sizes.pack_size) as pack_sizes')
+		)
+			->where([
+				'code' => $coupon_code,
+				'date' => $coupon_code_date,
+				'company_id' => $user_validation->company_id,
+			])
+			->leftJoin('coupon_pack_sizes', 'coupon_pack_sizes.coupon_id', 'coupons.id')
+			->groupBy('coupons.id')
 			->first();
 		if (!$coupon_validation) {
 			return response()->json([
@@ -65,11 +71,17 @@ class CouponController extends Controller {
 				'error' => 'Coupon not found',
 			], $this->successStatus);
 		} else {
-			$coupon = Coupon::where([
-				'code' => $coupon_code,
-				'date' => $coupon_code_date,
-				'company_id' => $user_validation->company_id,
-				'status_id' => 7400])
+			$coupon = Coupon::select(
+				'coupons.*',
+				DB::raw('group_concat(coupon_pack_sizes.pack_size) as pack_sizes')
+			)
+				->where([
+					'code' => $coupon_code,
+					'date' => $coupon_code_date,
+					'company_id' => $user_validation->company_id,
+					'status_id' => 7400])
+				->leftJoin('coupon_pack_sizes', 'coupon_pack_sizes.coupon_id', 'coupons.id')
+				->groupBy('coupons.id')
 				->first();
 			if (!$coupon) {
 				$redeemed_coupon = Coupon::select(
