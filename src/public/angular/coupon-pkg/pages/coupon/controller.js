@@ -147,7 +147,7 @@ app.component('couponCodesView', {
                 { data: 'action', class: 'action', searchable: false },
                 { data: 'qr_image', searchable: false },
                 { data: 'code', name: 'coupons.code', class: 'text-left' },
-                // { data: 'pack_size', name: 'coupons.pack_size', class: 'text-right' },
+                { data: 'pack_sizes', name: 'coupon_pack_sizes.pack_size', class: 'text-right' },
                 { data: 'point', name: 'coupons.point', class: 'text-right' },
             ],
             "infoCallback": function(settings, start, end, max, total, pre) {

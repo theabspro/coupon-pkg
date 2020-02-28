@@ -84,12 +84,15 @@ class CouponController extends Controller {
 			'coupons.id',
 			'coupons.code',
 			'coupons.date',
-			'coupons.point'
-			// 'coupons.pack_size'
+			'coupons.point',
+			DB::raw('group_concat(coupon_pack_sizes.pack_size) as pack_sizes')
 		)
+			->leftJoin('coupon_pack_sizes', 'coupon_pack_sizes.coupon_id', 'coupons.id')
 			->where('coupons.company_id', Auth::user()->company_id)
 			->where('coupons.date', $date)
-			->orderby('coupons.id', 'asc');
+			->groupBy('coupons.id')
+			->orderby('coupons.id', 'asc')
+		;
 		// dd($Coupon_code_list);
 		return Datatables::of($Coupon_code_list)
 			->addColumn('action', function ($Coupon_code_list) {
@@ -113,7 +116,7 @@ class CouponController extends Controller {
 			DB::raw('DATE_FORMAT(coupons.date,"%d/%m/%Y") as date'),
 			DB::raw('DATE_FORMAT(coupons.updated_at,"%d/%m/%Y") as updated_date'),
 			DB::raw('DATE_FORMAT(coupons.claimed_date,"%d/%m/%Y") as climed_date'),
-			// 'coupons.pack_size',
+			DB::raw('group_concat(coupon_pack_sizes.pack_size) as pack_sizes'),
 			'configs.name as status',
 			'mpay_employee_details.employee_name as clime_initiated_by',
 			'mpay_employee_details.employee_code as clime_initiated_by_code',
@@ -121,6 +124,7 @@ class CouponController extends Controller {
 			'mpay_customer_details.customer_code as claimed_to_code'
 			// 'payments.*'
 		)
+			->leftJoin('coupon_pack_sizes', 'coupon_pack_sizes.coupon_id', 'coupons.id')
 			->leftJoin('configs', 'configs.id', 'coupons.status_id')
 			->leftJoin('users', 'users.id', 'coupons.claim_initiated_by_id')
 			->leftJoin('mpay_employee_details', 'mpay_employee_details.id', 'users.entity_id')
@@ -128,6 +132,7 @@ class CouponController extends Controller {
 			->leftJoin('mpay_customer_details', 'mpay_customer_details.id', 'customer.entity_id')
 			->leftJoin('payments', 'payments.id', 'coupons.payment_id')
 			->where('coupons.id', $id)
+			->groupBy('coupons.id')
 			->first();
 		return response()->json($this->data);
 	}
